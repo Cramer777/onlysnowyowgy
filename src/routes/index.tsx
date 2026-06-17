@@ -430,8 +430,10 @@ function MemoryVault() {
               <div className="text-xs uppercase tracking-[0.4em] text-white/60">Memory {String(open + 1).padStart(2, "0")}</div>
               <div className="mt-3 text-4xl text-white" style={{ fontFamily: "var(--font-display)" }}>{MEMORIES[open].title}</div>
               <div className="mt-4 text-white/75">{MEMORIES[open].note}</div>
-              <div className="mt-8 h-64 rounded-2xl"
-                style={{ background: "var(--gradient-nebula)", boxShadow: "var(--shadow-glow-violet)" }} />
+              <div className="mt-8 h-80 overflow-hidden rounded-2xl"
+                style={{ boxShadow: "var(--shadow-glow-violet)" }}>
+                <img src={MEMORIES[open].img} alt={MEMORIES[open].title} className="h-full w-full object-cover" />
+              </div>
             </motion.div>
           </motion.div>
         )}
