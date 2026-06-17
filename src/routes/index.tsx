@@ -86,13 +86,30 @@ function MusicPlayer() {
   const toggle = async () => {
     const a = ref.current; if (!a) return;
     try {
-      if (a.paused) { await a.play(); setPlaying(true); }
+      if (a.paused) { a.muted = false; a.volume = 0.85; await a.play(); setPlaying(true); }
       else { a.pause(); setPlaying(false); }
     } catch { setMissing(true); }
   };
+  useEffect(() => {
+    const start = async () => {
+      const a = ref.current; if (!a) return;
+      try { a.muted = false; a.volume = 0.85; await a.play(); setPlaying(true); }
+      catch { setMissing(true); }
+    };
+    window.addEventListener("play-music", start);
+    // attempt autoplay on first user gesture anywhere
+    const onGesture = () => { start(); window.removeEventListener("pointerdown", onGesture); window.removeEventListener("keydown", onGesture); };
+    window.addEventListener("pointerdown", onGesture);
+    window.addEventListener("keydown", onGesture);
+    return () => {
+      window.removeEventListener("play-music", start);
+      window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("keydown", onGesture);
+    };
+  }, []);
   return (
     <div className="fixed bottom-5 right-5 z-50">
-      <audio ref={ref} src="/music/ik-kudi.mp3" loop preload="none" onError={() => setMissing(true)} />
+      <audio ref={ref} src="/music/ik-kudi.mp3" loop preload="auto" onError={() => setMissing(true)} />
       <button
         onClick={toggle}
         className="glass-card flex items-center gap-3 rounded-full px-4 py-3 text-sm transition hover:scale-105"
@@ -109,12 +126,13 @@ function MusicPlayer() {
       </button>
       {missing && (
         <div className="glass-card mt-2 max-w-[260px] rounded-xl px-3 py-2 text-[11px] text-white/70">
-          Drop your audio at <code className="text-rose">/public/music/ik-kudi.mp3</code> to enable playback.
+          Tap ▶ to play music.
         </div>
       )}
     </div>
   );
 }
+
 
 /* ---------- Section 1: Welcome Portal ---------- */
 function WelcomePortal({ onEnter }: { onEnter: () => void }) {
