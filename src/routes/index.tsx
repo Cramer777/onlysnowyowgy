@@ -1,11 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
-import couplePhoto from "@/assets/couple-cosmic.jpg";
-import memTogether from "@/assets/memory-together.jpg";
-import memBees from "@/assets/memory-bees.jpg";
-import memCilantro from "@/assets/memory-cilantro.jpg";
-import memPrincess from "@/assets/memory-princess.jpg";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+
+import couplePhoto from "@/assets/uploads/IMG_20260616_145518.jpg.asset.json";
+import girlGingham from "@/assets/uploads/IMG_20260616_145719.jpg.asset.json";
+import girlHeart from "@/assets/uploads/IMG_20260616_145738.jpg.asset.json";
+import girlKnife from "@/assets/uploads/IMG_20260616_145808.jpg.asset.json";
+import girlGiggle from "@/assets/uploads/IMG_20260616_145824.jpg.asset.json";
+import girlAcha from "@/assets/uploads/IMG_20260616_145854.jpg.asset.json";
+import girlAww from "@/assets/uploads/IMG_20260616_145923.jpg.asset.json";
+import bearLick from "@/assets/uploads/IMG_20260616_150135.jpg.asset.json";
+import bearAxe from "@/assets/uploads/IMG_20260616_150308.jpg.asset.json";
+import bearGrin from "@/assets/uploads/IMG_20260616_150417.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,7 +23,7 @@ export const Route = createFileRoute("/")({
   component: OurUniverse,
 });
 
-/* ---------- Starfield (canvas) ---------- */
+/* ---------------- Backdrops ---------------- */
 function Starfield({ density = 220 }: { density?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -25,28 +31,20 @@ function Starfield({ density = 220 }: { density?: number }) {
     const ctx = c.getContext("2d")!;
     let raf = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const resize = () => {
-      c.width = c.offsetWidth * dpr;
-      c.height = c.offsetHeight * dpr;
-    };
+    const resize = () => { c.width = c.offsetWidth * dpr; c.height = c.offsetHeight * dpr; };
     resize();
     window.addEventListener("resize", resize);
     const stars = Array.from({ length: density }, () => ({
-      x: Math.random() * c.width,
-      y: Math.random() * c.height,
-      z: Math.random() * 1 + 0.2,
-      r: Math.random() * 1.4 + 0.2,
+      x: Math.random() * c.width, y: Math.random() * c.height,
+      z: Math.random() * 1 + 0.2, r: Math.random() * 1.4 + 0.2,
       tw: Math.random() * Math.PI * 2,
       hue: Math.random() > 0.7 ? 320 : 280,
     }));
     const draw = () => {
       ctx.clearRect(0, 0, c.width, c.height);
-      // nebula tint
-      const g = ctx.createRadialGradient(c.width / 2, c.height / 2, 0, c.width / 2, c.height / 2, c.width / 1.4);
-      g.addColorStop(0, "rgba(180,80,200,0.10)");
-      g.addColorStop(1, "rgba(10,5,30,0)");
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, c.width, c.height);
+      const g = ctx.createRadialGradient(c.width/2, c.height/2, 0, c.width/2, c.height/2, c.width/1.4);
+      g.addColorStop(0, "rgba(180,80,200,0.10)"); g.addColorStop(1, "rgba(10,5,30,0)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, c.width, c.height);
       for (const s of stars) {
         s.tw += 0.02;
         const a = 0.4 + Math.sin(s.tw) * 0.5;
@@ -78,7 +76,7 @@ function NebulaBlobs() {
   );
 }
 
-/* ---------- Music Player ---------- */
+/* ---------------- Music ---------------- */
 function MusicPlayer() {
   const ref = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -97,7 +95,6 @@ function MusicPlayer() {
       catch { setMissing(true); }
     };
     window.addEventListener("play-music", start);
-    // attempt autoplay on first user gesture anywhere
     const onGesture = () => { start(); window.removeEventListener("pointerdown", onGesture); window.removeEventListener("keydown", onGesture); };
     window.addEventListener("pointerdown", onGesture);
     window.addEventListener("keydown", onGesture);
@@ -110,65 +107,54 @@ function MusicPlayer() {
   return (
     <div className="fixed bottom-5 right-5 z-50">
       <audio ref={ref} src="/music/ik-kudi.mp3" loop preload="auto" onError={() => setMissing(true)} />
-      <button
-        onClick={toggle}
+      <button onClick={toggle}
         className="glass-card flex items-center gap-3 rounded-full px-4 py-3 text-sm transition hover:scale-105"
-        style={{ boxShadow: "var(--shadow-glow-pink)" }}
-      >
+        style={{ boxShadow: "var(--shadow-glow-pink)" }}>
         <span className={`grid h-9 w-9 place-items-center rounded-full ${playing ? "animate-pulse-glow" : ""}`}
-          style={{ background: "var(--gradient-nebula)" }}>
-          {playing ? "❚❚" : "▶"}
-        </span>
+          style={{ background: "var(--gradient-nebula)" }}>{playing ? "❚❚" : "▶"}</span>
         <div className="text-left leading-tight">
           <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Now Playing</div>
           <div className="font-medium">Ik Kudi · Arpit Bala</div>
         </div>
       </button>
       {missing && (
-        <div className="glass-card mt-2 max-w-[260px] rounded-xl px-3 py-2 text-[11px] text-white/70">
-          Tap ▶ to play music.
-        </div>
+        <div className="glass-card mt-2 max-w-[260px] rounded-xl px-3 py-2 text-[11px] text-white/70">Tap ▶ to play music.</div>
       )}
     </div>
   );
 }
 
-
-/* ---------- Section 1: Welcome Portal ---------- */
+/* ---------------- Scene 0: Welcome ---------------- */
 function WelcomePortal({ onEnter }: { onEnter: () => void }) {
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
       <div className="absolute inset-0"><Starfield density={260} /></div>
       <NebulaBlobs />
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
+        initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.4, ease: "easeOut" }}
         className="relative z-10 px-6 text-center"
       >
-        <div className="mb-4 text-xs uppercase tracking-[0.5em] text-white/60">A Cinematic Love Story</div>
         <h1 className="text-gradient-rose text-5xl font-light leading-[1.05] sm:text-7xl md:text-8xl">
           Welcome Snowy Owgy <span className="inline-block animate-float-y">✨</span>
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-base text-white/75 sm:text-lg" style={{ fontFamily: "var(--font-hand)", fontSize: "1.5rem" }}>
+        <p className="mx-auto mt-6 max-w-xl text-base text-white/80 sm:text-lg"
+          style={{ fontFamily: "var(--font-hand)", fontSize: "1.5rem" }}>
           Flamobita built a universe for you...
         </p>
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onEnter}
+          whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={onEnter}
           className="animate-pulse-glow mt-12 rounded-full px-10 py-5 text-base font-medium tracking-wide text-white"
           style={{ background: "var(--gradient-nebula)" }}
         >
           🚀 Enter Our Universe
         </motion.button>
-        <div className="mt-16 text-xs uppercase tracking-[0.4em] text-white/40">scroll to drift</div>
       </motion.div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- Section 2: Our Universe (3D tilt photo) ---------- */
+/* ---------------- Scene 1: Universe (couple avatar) ---------------- */
 function TiltPhoto() {
   const ref = useRef<HTMLDivElement>(null);
   const rx = useMotionValue(0), ry = useMotionValue(0);
@@ -183,48 +169,35 @@ function TiltPhoto() {
   const reset = () => { rx.set(0); ry.set(0); };
   return (
     <div className="relative" style={{ perspective: 1200 }}>
-      <motion.div
-        ref={ref}
-        onMouseMove={onMove}
-        onMouseLeave={reset}
+      <motion.div ref={ref} onMouseMove={onMove} onMouseLeave={reset}
         style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d" }}
-        className="animate-float-y relative h-[420px] w-[320px] overflow-hidden rounded-[2rem] sm:h-[560px] sm:w-[440px]"
-      >
+        className="animate-float-y relative h-[360px] w-[300px] overflow-hidden rounded-[2rem] sm:h-[520px] sm:w-[420px]">
         <div className="absolute -inset-1 rounded-[2.2rem] opacity-90 blur-2xl"
           style={{ background: "var(--gradient-nebula)" }} />
-        <img
-          src={couplePhoto}
-          alt="Flamobita and Snowy Owgy floating in their cosmic universe"
-          width={1024}
-          height={1280}
+        <img src={couplePhoto.url} alt="Flamobita and Snowy Owgy"
           className="relative h-full w-full rounded-[2rem] object-cover"
-          style={{ boxShadow: "var(--shadow-glow-pink)" }}
-        />
-        {/* sparkle particles */}
+          style={{ boxShadow: "var(--shadow-glow-pink)" }} />
         {Array.from({ length: 12 }).map((_, i) => (
-          <span key={i}
-            className="animate-twinkle absolute h-1 w-1 rounded-full bg-white"
+          <span key={i} className="animate-twinkle absolute h-1 w-1 rounded-full bg-white"
             style={{
-              top: `${(i * 53) % 100}%`,
-              left: `${(i * 37) % 100}%`,
+              top: `${(i * 53) % 100}%`, left: `${(i * 37) % 100}%`,
               animationDelay: `${i * 0.3}s`,
               boxShadow: "0 0 10px white, 0 0 20px oklch(0.78 0.22 340)",
-            }}
-          />
+            }} />
         ))}
       </motion.div>
     </div>
   );
 }
 
-function UniverseSection() {
+function UniverseScene() {
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden py-24">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden py-12">
       <NebulaBlobs />
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-16 px-6 md:grid-cols-2">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-6 md:grid-cols-2">
         <div className="flex justify-center"><TiltPhoto /></div>
         <div className="text-center md:text-left">
-          <div className="mb-3 text-xs uppercase tracking-[0.5em] text-white/60">Chapter II</div>
+          <div className="mb-3 text-xs uppercase tracking-[0.5em] text-white/60">Chapter I</div>
           <h2 className="text-gradient-rose text-5xl font-light leading-tight sm:text-6xl">
             Flamobita <span className="text-rose">❤</span> Snowy Owgy
           </h2>
@@ -233,11 +206,11 @@ function UniverseSection() {
           </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- Section 3: Chat Galaxy (solar system) ---------- */
+/* ---------------- Scene 2: Chat Galaxy ---------------- */
 const CHAT_QUOTES = [
   "Tya tare rhe ho?", "Kuch nhi", "Kyaa?", "Noiii", "Toiiii", "Kyuoii",
   "IDK", "Happoo", "Tum pagal ho", "Tum bhi pagal ho", "Nachoooooo",
@@ -246,13 +219,13 @@ const CHAT_QUOTES = [
   "Ghumne taaleeee", "Bakwas mt kro", "Tum pookiee ho", "Tum barbiee ho", "🤜🏻🤛🏻",
 ];
 
-function ChatGalaxy() {
+function ChatGalaxyScene() {
   const [active, setActive] = useState<string | null>(null);
   const rings = useMemo(() => {
     const perRing = [6, 8, 10];
     const out: { text: string; ring: number; idx: number; total: number; radius: number; duration: number }[] = [];
     let i = 0;
-    const radii = [150, 240, 330];
+    const radii = [110, 180, 250];
     const durations = [40, 60, 85];
     perRing.forEach((count, ringIdx) => {
       for (let k = 0; k < count && i < CHAT_QUOTES.length; k++, i++) {
@@ -263,45 +236,34 @@ function ChatGalaxy() {
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden py-24">
+    <div className="relative h-full w-full overflow-hidden">
       <div className="absolute inset-0"><Starfield density={140} /></div>
-      <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
-        <div className="mb-2 text-xs uppercase tracking-[0.5em] text-white/60">Chapter III</div>
-        <h2 className="text-gradient-rose text-5xl font-light sm:text-6xl">Chat Galaxy</h2>
-        <p className="mt-3 text-white/60">Every word, a planet orbiting us.</p>
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+        <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter II</div>
+        <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Chat Galaxy</h2>
+        <p className="mt-2 text-sm text-white/60">Every word, a planet orbiting us.</p>
 
-        <div className="relative mx-auto mt-16 h-[720px] w-full max-w-[760px]">
-          {/* orbit rings */}
-          {[150, 240, 330].map((r) => (
+        <div className="relative mx-auto mt-4 h-[560px] w-full max-w-[640px] flex-1">
+          {[110, 180, 250].map((r) => (
             <div key={r}
               className="absolute left-1/2 top-1/2 rounded-full border border-white/10"
-              style={{ width: r * 2, height: r * 2, transform: "translate(-50%, -50%)" }}
-            />
+              style={{ width: r * 2, height: r * 2, transform: "translate(-50%, -50%)" }} />
           ))}
-          {/* sun */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="animate-pulse-glow grid h-32 w-32 place-items-center rounded-full text-center text-sm font-medium text-white sm:h-40 sm:w-40"
+            <div className="animate-pulse-glow grid h-28 w-28 place-items-center rounded-full text-center text-sm font-medium text-white sm:h-32 sm:w-32"
               style={{ background: "radial-gradient(circle at 30% 30%, oklch(0.92 0.15 350), oklch(0.65 0.28 340) 60%, oklch(0.40 0.22 320))" }}>
-              Snowy Owgy <br /> ❤
+              Snowy Owgy<br />❤
             </div>
           </div>
-
           {rings.map((p, i) => {
             const angle = (p.idx / p.total) * 360;
             return (
-              <div key={i}
-                className="absolute left-1/2 top-1/2"
-                style={{
-                  animation: `spin-slow ${p.duration}s linear infinite`,
-                  transformOrigin: "0 0",
-                }}
-              >
+              <div key={i} className="absolute left-1/2 top-1/2"
+                style={{ animation: `spin-slow ${p.duration}s linear infinite`, transformOrigin: "0 0" }}>
                 <div style={{ transform: `rotate(${angle}deg) translate(${p.radius}px) rotate(-${angle}deg)` }}>
-                  <button
-                    onClick={() => setActive(p.text)}
+                  <button onClick={() => setActive(p.text)}
                     className="glass-card -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1.5 text-xs text-white/90 transition hover:scale-110"
-                    style={{ boxShadow: "0 0 20px oklch(0.65 0.25 340 / 0.5)" }}
-                  >
+                    style={{ boxShadow: "0 0 20px oklch(0.65 0.25 340 / 0.5)" }}>
                     {p.text}
                   </button>
                 </div>
@@ -313,117 +275,139 @@ function ChatGalaxy() {
 
       <AnimatePresence>
         {active && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setActive(null)}
-            className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-md p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9 }}
+            className="fixed inset-0 z-50 grid place-items-center bg-black/60 backdrop-blur-md p-6">
+            <motion.div initial={{ scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9 }}
               transition={{ type: "spring", damping: 18 }}
               className="glass-card max-w-md rounded-3xl p-10 text-center"
-              style={{ boxShadow: "var(--shadow-glow-pink)" }}
-            >
+              style={{ boxShadow: "var(--shadow-glow-pink)" }}>
               <div className="text-xs uppercase tracking-[0.4em] text-white/60">A memory</div>
-              <p className="mt-4 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>“{active}”</p>
+              <p className="mt-4 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>"{active}"</p>
               <div className="mt-6 text-sm text-white/60">— from our chat universe</div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </div>
   );
 }
 
-/* ---------- Section 4: Sticker Kingdom ---------- */
-const STICKERS = ["🌸","🦄","🐻","🌙","💖","🍓","🐰","✨","🧸","🌈","🍰","💫","🪐","🌷","🎀","🐼"];
-function StickerKingdom() {
-  return (
-    <section className="relative min-h-screen overflow-hidden py-24">
-      <NebulaBlobs />
-      <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
-        <div className="mb-2 text-xs uppercase tracking-[0.5em] text-white/60">Chapter IV</div>
-        <h2 className="text-gradient-rose text-5xl font-light sm:text-6xl">Sticker Kingdom</h2>
-        <p className="mt-3 text-white/60">A floating island made of all our cuteness.</p>
-
-        <div className="relative mx-auto mt-16 h-[500px] w-full max-w-3xl">
-          {/* island base */}
-          <div className="absolute bottom-10 left-1/2 h-40 w-[80%] -translate-x-1/2 rounded-[50%] blur-2xl"
-            style={{ background: "radial-gradient(ellipse, oklch(0.65 0.25 340 / 0.7), transparent 70%)" }} />
-          <div className="animate-float-y absolute bottom-12 left-1/2 grid h-44 w-72 -translate-x-1/2 place-items-center rounded-[50%] glass-card text-5xl"
-            style={{ boxShadow: "var(--shadow-glow-pink)" }}>
-            🏰
-          </div>
-          {STICKERS.map((s, i) => {
-            const angle = (i / STICKERS.length) * Math.PI * 2;
-            const r = 180 + (i % 3) * 30;
-            const x = Math.cos(angle) * r;
-            const y = Math.sin(angle) * (r * 0.6) - 60;
-            return (
-              <motion.div
-                key={i}
-                className="absolute left-1/2 top-1/2 cursor-pointer text-4xl sm:text-5xl"
-                style={{ x, y }}
-                animate={{ y: [y, y - 15, y], rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 4 + (i % 4), repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                whileHover={{ scale: 1.4, rotate: 20, filter: "drop-shadow(0 0 18px oklch(0.85 0.2 340))" }}
-              >
-                {s}
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- Section 5: Memory Vault ---------- */
-const MEMORIES = [
-  { title: "Us, Together", note: "The day the universe stood still.", img: memTogether },
-  { title: "Honey & Bees", note: "Sweet as the song that played.", img: memBees },
-  { title: "Crowned in Green", note: "Silly, soft, unforgettable.", img: memCilantro },
-  { title: "Little Princess", note: "Born to wear a crown.", img: memPrincess },
-  { title: "Late Night Calls", note: "When the moon was our witness.", img: couplePhoto },
-  { title: "Our Forever", note: "Just beginning.", img: memTogether },
+/* ---------------- Scene 3: Sticker Kingdom (bears) ---------------- */
+const BEAR_STICKERS = [
+  { img: bearLick.url, caption: "Yumm 🤤", mood: "Tasty thoughts" },
+  { img: bearAxe.url, caption: "Don't test me 🪓", mood: "Tiny warrior" },
+  { img: bearGrin.url, caption: "Cheeeese 😬", mood: "Big silly grin" },
 ];
 
-function MemoryVault() {
+function StickerKingdomScene() {
+  const [active, setActive] = useState<number | null>(null);
+  return (
+    <div className="relative h-full w-full overflow-hidden">
+      <NebulaBlobs />
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+        <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter III</div>
+        <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Sticker Kingdom</h2>
+        <p className="mt-2 text-sm text-white/60">Your favorite little bears, floating in our sky.</p>
+
+        <div className="relative mt-10 grid w-full max-w-4xl flex-1 place-items-center">
+          {/* aurora pad */}
+          <div className="absolute inset-0 mx-auto h-72 w-72 rounded-full opacity-60 blur-3xl"
+            style={{ background: "radial-gradient(circle, oklch(0.65 0.25 340 / 0.6), transparent 70%)" }} />
+
+          <div className="relative grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-10">
+            {BEAR_STICKERS.map((s, i) => (
+              <motion.button
+                key={i}
+                onClick={() => setActive(i)}
+                initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: i * 0.15 }}
+                whileHover={{ scale: 1.08, rotate: i % 2 ? 4 : -4 }}
+                className="group relative"
+              >
+                <motion.div
+                  animate={{ y: [0, -14, 0], rotate: [0, i % 2 ? 3 : -3, 0] }}
+                  transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+                  className="relative grid h-56 w-56 place-items-center rounded-[2rem] glass-card sm:h-60 sm:w-60"
+                  style={{ boxShadow: "var(--shadow-glow-pink)" }}
+                >
+                  <div className="absolute inset-3 rounded-[1.6rem] opacity-50 blur-2xl"
+                    style={{ background: "var(--gradient-nebula)" }} />
+                  <img src={s.img} alt={s.caption}
+                    className="relative h-44 w-44 object-contain drop-shadow-[0_8px_24px_rgba(255,180,230,0.55)]" />
+                </motion.div>
+                <div className="mt-3 text-sm text-white/85" style={{ fontFamily: "var(--font-hand)", fontSize: "1.25rem" }}>
+                  {s.caption}
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {active !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setActive(null)}
+            className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6">
+            <motion.div initial={{ scale: 0.8, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85 }}
+              transition={{ type: "spring", damping: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-card relative w-full max-w-sm rounded-3xl p-8 text-center"
+              style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+              <img src={BEAR_STICKERS[active].img} alt="" className="mx-auto h-60 w-60 object-contain" />
+              <div className="mt-4 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>
+                {BEAR_STICKERS[active].caption}
+              </div>
+              <div className="mt-1 text-sm text-white/65">{BEAR_STICKERS[active].mood}</div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------------- Scene 4: Memory Vault ---------------- */
+const MEMORIES = [
+  { title: "Us, Together", note: "The day the universe stood still.", img: couplePhoto.url },
+  { title: "You Make My Heart", note: "Hand-built into a tiny heart.", img: girlHeart.url },
+  { title: "My Pookie", note: "Soft, silly, perfect.", img: girlGingham.url },
+  { title: "Don't Mess With Snowy", note: "Cute. Dangerous. Iconic.", img: girlKnife.url },
+  { title: "Giggles & Glasses", note: "Your laugh is my favorite song.", img: girlGiggle.url },
+  { title: "Achaa…", note: "That look. Every time.", img: girlAcha.url },
+  { title: "Awwwww 🌷", note: "Maximum cuteness overload.", img: girlAww.url },
+];
+
+function MemoryVaultScene() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section className="relative min-h-screen overflow-hidden py-24">
+    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
       <div className="absolute inset-0"><Starfield density={120} /></div>
-      <div className="relative z-10 mx-auto max-w-6xl px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-10">
         <div className="text-center">
-          <div className="mb-2 text-xs uppercase tracking-[0.5em] text-white/60">Chapter V</div>
-          <h2 className="text-gradient-rose text-5xl font-light sm:text-6xl">Memory Vault</h2>
-          <p className="mt-3 text-white/60">A gallery from our shared sky.</p>
+          <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter IV</div>
+          <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Memory Vault</h2>
+          <p className="mt-2 text-sm text-white/60">A gallery from our shared sky.</p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
           {MEMORIES.map((m, i) => (
             <motion.button
-              key={i}
-              onClick={() => setOpen(i)}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.7, delay: i * 0.08 }}
+              key={i} onClick={() => setOpen(i)}
+              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: i * 0.06 }}
               whileHover={{ y: -8, rotateX: 4, rotateY: -4 }}
-              className="group glass-card relative h-72 overflow-hidden rounded-3xl text-left"
-              style={{ transformStyle: "preserve-3d" }}
-            >
+              className="group glass-card relative h-56 overflow-hidden rounded-3xl text-left sm:h-64"
+              style={{ transformStyle: "preserve-3d" }}>
               <div className="absolute inset-0 transition duration-700 group-hover:scale-110"
-                style={{
-                  backgroundImage: `url(${m.img})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }} />
+                style={{ backgroundImage: `url(${m.img})`, backgroundSize: "cover", backgroundPosition: "center" }} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-              <div className="relative z-10 flex h-full flex-col justify-end p-6">
-                <div className="text-xs uppercase tracking-[0.3em] text-white/60">Memory {String(i + 1).padStart(2, "0")}</div>
-                <div className="mt-1 text-2xl font-light text-white" style={{ fontFamily: "var(--font-display)" }}>{m.title}</div>
-                <div className="mt-2 text-sm text-white/70">{m.note}</div>
+              <div className="relative z-10 flex h-full flex-col justify-end p-4">
+                <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">Memory {String(i + 1).padStart(2, "0")}</div>
+                <div className="mt-1 text-lg font-light text-white sm:text-xl" style={{ fontFamily: "var(--font-display)" }}>{m.title}</div>
+                <div className="mt-1 text-xs text-white/70">{m.note}</div>
               </div>
             </motion.button>
           ))}
@@ -432,353 +416,119 @@ function MemoryVault() {
 
       <AnimatePresence>
         {open !== null && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setOpen(null)}
-            className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.7, opacity: 0, rotateX: -20 }}
-              animate={{ scale: 1, opacity: 1, rotateX: 0 }}
-              exit={{ scale: 0.85, opacity: 0 }}
-              transition={{ type: "spring", damping: 22 }}
-              className="glass-card relative w-full max-w-2xl overflow-hidden rounded-3xl p-10"
-              style={{ boxShadow: "var(--shadow-glow-pink)" }}
-            >
+            className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6">
+            <motion.div initial={{ scale: 0.7, opacity: 0, rotateX: -20 }} animate={{ scale: 1, opacity: 1, rotateX: 0 }}
+              exit={{ scale: 0.85, opacity: 0 }} transition={{ type: "spring", damping: 22 }}
+              className="glass-card relative w-full max-w-2xl overflow-hidden rounded-3xl p-8"
+              style={{ boxShadow: "var(--shadow-glow-pink)" }}>
               <div className="text-xs uppercase tracking-[0.4em] text-white/60">Memory {String(open + 1).padStart(2, "0")}</div>
-              <div className="mt-3 text-4xl text-white" style={{ fontFamily: "var(--font-display)" }}>{MEMORIES[open].title}</div>
-              <div className="mt-4 text-white/75">{MEMORIES[open].note}</div>
-              <div className="mt-8 h-80 overflow-hidden rounded-2xl"
-                style={{ boxShadow: "var(--shadow-glow-violet)" }}>
+              <div className="mt-2 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{MEMORIES[open].title}</div>
+              <div className="mt-2 text-white/75">{MEMORIES[open].note}</div>
+              <div className="mt-6 h-72 overflow-hidden rounded-2xl" style={{ boxShadow: "var(--shadow-glow-violet)" }}>
                 <img src={MEMORIES[open].img} alt={MEMORIES[open].title} className="h-full w-full object-cover" />
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </div>
   );
 }
 
-/* ---------- Section 6: World Tour Globe ---------- */
+/* ---------------- Scene 5: World Tour (real photos in 3D) ---------------- */
 const PLACES = [
-  { name: "Paris", flag: "🇫🇷", landmark: "🗼", color: "oklch(0.78 0.18 30)" },
-  { name: "Switzerland", flag: "🇨🇭", landmark: "🏔️", color: "oklch(0.85 0.10 220)" },
-  { name: "Italy", flag: "🇮🇹", landmark: "🏛️", color: "oklch(0.75 0.18 80)" },
-  { name: "Germany", flag: "🇩🇪", landmark: "🏰", color: "oklch(0.70 0.20 60)" },
-  { name: "Norway", flag: "🇳🇴", landmark: "🛶", color: "oklch(0.70 0.20 240)" },
-  { name: "Japan", flag: "🇯🇵", landmark: "⛩️", color: "oklch(0.75 0.22 20)" },
-  { name: "China", flag: "🇨🇳", landmark: "🏯", color: "oklch(0.78 0.20 40)" },
-  { name: "Disney World", flag: "🏰", landmark: "🎡", color: "oklch(0.80 0.22 320)" },
-  { name: "Edinburgh", flag: "🏴", landmark: "🏰", color: "oklch(0.70 0.15 160)" },
-  { name: "India", flag: "🇮🇳", landmark: "🕌", color: "oklch(0.80 0.20 90)" },
+  { name: "Paris",       flag: "🇫🇷", landmark: "Eiffel Tower",         img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900&q=80", color: "oklch(0.78 0.18 30)" },
+  { name: "Switzerland", flag: "🇨🇭", landmark: "The Matterhorn",       img: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900&q=80", color: "oklch(0.85 0.10 220)" },
+  { name: "Italy",       flag: "🇮🇹", landmark: "Roman Colosseum",      img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=900&q=80", color: "oklch(0.75 0.18 80)" },
+  { name: "Germany",     flag: "🇩🇪", landmark: "Neuschwanstein",       img: "https://images.unsplash.com/photo-1583951166052-e0c8d4d72b2c?w=900&q=80", color: "oklch(0.70 0.20 60)" },
+  { name: "Norway",      flag: "🇳🇴", landmark: "Norwegian Fjords",     img: "https://images.unsplash.com/photo-1601439678777-b2b3c56fa627?w=900&q=80", color: "oklch(0.70 0.20 240)" },
+  { name: "Japan",       flag: "🇯🇵", landmark: "Fushimi Inari Shrine", img: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=900&q=80", color: "oklch(0.75 0.22 20)" },
+  { name: "China",       flag: "🇨🇳", landmark: "The Great Wall",       img: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=900&q=80", color: "oklch(0.78 0.20 40)" },
+  { name: "Disney World",flag: "🏰", landmark: "Magic Kingdom",         img: "https://images.unsplash.com/photo-1597466599360-3b9775841aec?w=900&q=80", color: "oklch(0.80 0.22 320)" },
+  { name: "Edinburgh",   flag: "🏴", landmark: "Edinburgh Castle",      img: "https://images.unsplash.com/photo-1566041510639-8d95a2490bfb?w=900&q=80", color: "oklch(0.70 0.15 160)" },
+  { name: "India",       flag: "🇮🇳", landmark: "Taj Mahal",            img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=900&q=80", color: "oklch(0.80 0.20 90)" },
 ];
 
-/* ---------- Per-place diorama scenes ---------- */
-type SceneProps = { color: string };
-
-function SceneStage({
-  sky, ground, glow, children,
-}: { sky: string; ground: string; glow: string; children: React.ReactNode }) {
+function PlaceDiorama({ img, color, particles }: { img: string; color: string; particles: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rx = useMotionValue(0), ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 120, damping: 18 });
+  const sry = useSpring(ry, { stiffness: 120, damping: 18 });
+  const onMove = (e: React.MouseEvent) => {
+    const r = ref.current!.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    ry.set(x * 22); rx.set(-y * 16);
+  };
+  const reset = () => { rx.set(0); ry.set(0); };
   return (
-    <motion.div
-      className="relative mx-auto overflow-hidden rounded-3xl"
-      style={{
-        width: 320, height: 240, perspective: 1000,
-        background: sky,
-        boxShadow: `inset 0 -40px 80px ${glow}, 0 20px 60px ${glow}`,
-      }}
-      animate={{ rotateY: [-6, 6, -6], rotateX: [-2, 2, -2] }}
-      transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-    >
-      {/* ambient light */}
-      <div className="pointer-events-none absolute inset-0"
-        style={{ background: `radial-gradient(ellipse at 50% 30%, ${glow}, transparent 65%)` }} />
-      {/* ground */}
-      <div className="absolute inset-x-0 bottom-0 h-[38%]"
-        style={{ background: ground, transform: "translateZ(0)" }} />
-      <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
-        {children}
-      </div>
-    </motion.div>
+    <div className="mx-auto" style={{ perspective: 1000 }}>
+      <motion.div
+        ref={ref} onMouseMove={onMove} onMouseLeave={reset}
+        style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d",
+          boxShadow: `0 30px 70px ${color}, inset 0 -40px 80px ${color}` }}
+        className="relative h-[260px] w-[320px] overflow-hidden rounded-3xl"
+      >
+        {/* Far layer: photo */}
+        <motion.img src={img} alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ transform: "translateZ(-40px) scale(1.15)" }}
+          animate={{ scale: [1.15, 1.22, 1.15] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
+        {/* Ambient color wash */}
+        <div className="absolute inset-0 mix-blend-overlay"
+          style={{ background: `radial-gradient(ellipse at 50% 30%, ${color}, transparent 70%)` }} />
+        {/* Vignette */}
+        <div className="absolute inset-0"
+          style={{ background: "radial-gradient(ellipse at 50% 60%, transparent 40%, rgba(0,0,0,0.55) 100%)" }} />
+        {/* Foreground floating particles */}
+        <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
+          {Array.from({ length: 14 }).map((_, i) => {
+            const left = (i * 53 + 11) % 100;
+            const dur = 4 + ((i * 1.3) % 5);
+            return (
+              <motion.span key={i}
+                className="absolute"
+                style={{
+                  left: `${left}%`, top: "100%", fontSize: 14,
+                  filter: `drop-shadow(0 0 6px ${color})`,
+                  transform: "translateZ(40px)",
+                }}
+                animate={{ y: [0, -260], x: [0, ((i % 2 === 0 ? 1 : -1) * 24)], opacity: [0, 1, 0], rotate: [0, 180] }}
+                transition={{ duration: dur, repeat: Infinity, delay: (i * 0.3) % 4, ease: "linear" }}
+              >{particles}</motion.span>
+            );
+          })}
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
-function Particles({
-  count, emoji, color, drift = "down", size = 14,
-}: { count: number; emoji?: string; color?: string; drift?: "down" | "up" | "float"; size?: number }) {
-  const dir = drift === "up" ? -1 : 1;
-  return (
-    <>
-      {Array.from({ length: count }).map((_, i) => {
-        const left = (i * 53 + 11) % 100;
-        const delay = (i * 0.37) % 4;
-        const dur = 4 + ((i * 1.3) % 5);
-        return (
-          <motion.span key={i}
-            className="absolute"
-            style={{
-              left: `${left}%`, top: drift === "up" ? "100%" : "-10%",
-              fontSize: size,
-              filter: color ? `drop-shadow(0 0 6px ${color})` : undefined,
-            }}
-            animate={{
-              y: drift === "float" ? [0, -20, 0] : [0, dir * 280],
-              x: [0, ((i % 2 === 0 ? 1 : -1) * 30)],
-              opacity: drift === "float" ? [0.4, 1, 0.4] : [0, 1, 0],
-              rotate: [0, 180],
-            }}
-            transition={{ duration: dur, repeat: Infinity, delay, ease: "linear" }}
-          >
-            {emoji ?? "•"}
-          </motion.span>
-        );
-      })}
-    </>
-  );
-}
-
-function Prop({
-  children, x, y, z = 0, scale = 1, delay = 0,
-}: { children: React.ReactNode; x: number; y: number; z?: number; scale?: number; delay?: number }) {
-  return (
-    <motion.div
-      className="absolute"
-      style={{
-        left: `${x}%`, top: `${y}%`,
-        transform: `translate(-50%, -50%) translateZ(${z}px) scale(${scale})`,
-        fontSize: 64,
-      }}
-      animate={{ y: [0, -6, 0] }}
-      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function ParisScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.55 0.18 350), oklch(0.78 0.18 30) 60%, oklch(0.88 0.10 70))"
-      ground="linear-gradient(180deg, oklch(0.40 0.08 30), oklch(0.20 0.05 30))"
-      glow={color}
-    >
-      {/* sun */}
-      <div className="absolute left-[70%] top-[30%] h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ background: "radial-gradient(circle, white, " + color + " 60%, transparent 80%)", filter: "blur(2px)" }} />
-      <Prop x={50} y={58} z={60} scale={1.4}>🗼</Prop>
-      <Prop x={20} y={75} z={20} scale={0.8} delay={0.6}>🏛️</Prop>
-      <Prop x={82} y={78} z={20} scale={0.7} delay={1.2}>🌳</Prop>
-      <Particles count={10} emoji="❤️" color={color} drift="float" size={12} />
-      <Particles count={14} emoji="✨" color="white" drift="float" size={10} />
-    </SceneStage>
-  );
-}
-
-function SwitzerlandScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.70 0.10 240), oklch(0.90 0.05 220))"
-      ground="linear-gradient(180deg, oklch(0.85 0.04 220), oklch(0.95 0.02 220))"
-      glow={color}
-    >
-      <Prop x={30} y={55} z={40} scale={1.6}>🏔️</Prop>
-      <Prop x={65} y={50} z={70} scale={1.8} delay={0.4}>🏔️</Prop>
-      <Prop x={50} y={82} z={20} scale={0.9} delay={0.8}>🏠</Prop>
-      <Prop x={15} y={85} z={10} scale={0.7}>🌲</Prop>
-      <Prop x={85} y={85} z={10} scale={0.7} delay={1}>🌲</Prop>
-      <Particles count={20} emoji="❄️" color="white" drift="down" size={12} />
-    </SceneStage>
-  );
-}
-
-function ItalyScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.55 0.15 50), oklch(0.85 0.15 80))"
-      ground="linear-gradient(180deg, oklch(0.45 0.10 60), oklch(0.25 0.06 50))"
-      glow={color}
-    >
-      <Prop x={50} y={55} z={60} scale={1.5}>🏛️</Prop>
-      <Prop x={20} y={78} z={20} scale={0.8}>🍝</Prop>
-      <Prop x={80} y={78} z={20} scale={0.8} delay={0.6}>🍷</Prop>
-      <Particles count={16} emoji="✨" color={color} drift="float" size={10} />
-    </SceneStage>
-  );
-}
-
-function GermanyScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.40 0.08 50), oklch(0.75 0.15 60))"
-      ground="linear-gradient(180deg, oklch(0.35 0.10 140), oklch(0.18 0.06 140))"
-      glow={color}
-    >
-      <Prop x={50} y={50} z={70} scale={1.6}>🏰</Prop>
-      <Prop x={18} y={80} z={20} scale={0.7}>🌲</Prop>
-      <Prop x={82} y={80} z={20} scale={0.7} delay={0.5}>🌲</Prop>
-      <Prop x={50} y={85} z={30} scale={0.8} delay={1}>🍺</Prop>
-      <Particles count={12} emoji="🍂" color={color} drift="down" size={14} />
-    </SceneStage>
-  );
-}
-
-function NorwayScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.20 0.10 260), oklch(0.35 0.15 200))"
-      ground="linear-gradient(180deg, oklch(0.25 0.08 240), oklch(0.12 0.05 250))"
-      glow={color}
-    >
-      {/* aurora ribbons */}
-      {[0, 1, 2].map(i => (
-        <motion.div key={i}
-          className="absolute inset-x-0 h-24 blur-2xl"
-          style={{
-            top: `${10 + i * 8}%`,
-            background: `linear-gradient(90deg, transparent, oklch(0.75 0.20 ${150 + i * 40}), transparent)`,
-            opacity: 0.6,
-          }}
-          animate={{ x: [-40, 40, -40] }}
-          transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "easeInOut" }}
-        />
-      ))}
-      <Prop x={30} y={70} z={50} scale={1.4}>🏔️</Prop>
-      <Prop x={70} y={75} z={30} scale={1.1} delay={0.6}>🛶</Prop>
-      <Particles count={20} emoji="✦" color="white" drift="float" size={10} />
-    </SceneStage>
-  );
-}
-
-function JapanScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.75 0.15 350), oklch(0.90 0.10 20))"
-      ground="linear-gradient(180deg, oklch(0.55 0.12 20), oklch(0.30 0.08 20))"
-      glow={color}
-    >
-      <div className="absolute left-[25%] top-[28%] h-14 w-14 rounded-full"
-        style={{ background: color, filter: "blur(1px)", boxShadow: `0 0 40px ${color}` }} />
-      <Prop x={55} y={58} z={60} scale={1.5}>⛩️</Prop>
-      <Prop x={20} y={78} z={20} scale={0.9}>🌸</Prop>
-      <Prop x={82} y={80} z={20} scale={0.9} delay={0.7}>🎏</Prop>
-      <Particles count={22} emoji="🌸" color={color} drift="down" size={14} />
-    </SceneStage>
-  );
-}
-
-function ChinaScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.30 0.12 30), oklch(0.65 0.20 40))"
-      ground="linear-gradient(180deg, oklch(0.35 0.12 30), oklch(0.18 0.08 30))"
-      glow={color}
-    >
-      <Prop x={50} y={55} z={60} scale={1.5}>🏯</Prop>
-      <Prop x={18} y={45} z={40} scale={1} delay={0.3}>🏮</Prop>
-      <Prop x={82} y={50} z={40} scale={1} delay={0.9}>🏮</Prop>
-      <Prop x={50} y={85} z={20} scale={0.8} delay={1.5}>🐉</Prop>
-      <Particles count={14} emoji="✨" color={color} drift="up" size={12} />
-    </SceneStage>
-  );
-}
-
-function DisneyScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.30 0.18 290), oklch(0.65 0.22 320))"
-      ground="linear-gradient(180deg, oklch(0.45 0.18 320), oklch(0.20 0.10 300))"
-      glow={color}
-    >
-      <Prop x={50} y={55} z={70} scale={1.6}>🏰</Prop>
-      <Prop x={22} y={45} z={40} scale={1.2} delay={0.4}>🎡</Prop>
-      <Prop x={80} y={48} z={40} scale={1.1} delay={0.8}>🎠</Prop>
-      {/* fireworks */}
-      {[15, 50, 85].map((x, i) => (
-        <motion.div key={i}
-          className="absolute"
-          style={{ left: `${x}%`, top: "25%", fontSize: 28 }}
-          animate={{ scale: [0, 1.4, 0], opacity: [0, 1, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, delay: i * 0.7 }}
-        >🎆</motion.div>
-      ))}
-      <Particles count={18} emoji="✨" color={color} drift="float" size={12} />
-    </SceneStage>
-  );
-}
-
-function EdinburghScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.30 0.05 240), oklch(0.55 0.08 160))"
-      ground="linear-gradient(180deg, oklch(0.35 0.08 150), oklch(0.18 0.05 150))"
-      glow={color}
-    >
-      <Prop x={50} y={52} z={60} scale={1.5}>🏰</Prop>
-      <Prop x={20} y={80} z={20} scale={0.8}>🌲</Prop>
-      <Prop x={80} y={82} z={20} scale={0.8} delay={0.6}>🐑</Prop>
-      {/* mist */}
-      <motion.div className="absolute inset-x-0 top-[40%] h-16 blur-2xl"
-        style={{ background: "linear-gradient(90deg, transparent, white, transparent)", opacity: 0.25 }}
-        animate={{ x: [-60, 60, -60] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
-      <Particles count={18} emoji="💧" color="white" drift="down" size={10} />
-    </SceneStage>
-  );
-}
-
-function IndiaScene({ color }: SceneProps) {
-  return (
-    <SceneStage
-      sky="linear-gradient(180deg, oklch(0.40 0.18 40), oklch(0.85 0.20 80))"
-      ground="linear-gradient(180deg, oklch(0.45 0.15 60), oklch(0.20 0.08 50))"
-      glow={color}
-    >
-      <Prop x={50} y={55} z={70} scale={1.6}>🕌</Prop>
-      <Prop x={18} y={78} z={30} scale={0.9}>🪔</Prop>
-      <Prop x={82} y={78} z={30} scale={0.9} delay={0.6}>🪔</Prop>
-      <Prop x={50} y={88} z={20} scale={0.7} delay={1}>🌺</Prop>
-      <Particles count={20} emoji="✨" color={color} drift="up" size={12} />
-    </SceneStage>
-  );
-}
-
-const SCENES: Record<string, React.FC<SceneProps>> = {
-  "Paris": ParisScene,
-  "Switzerland": SwitzerlandScene,
-  "Italy": ItalyScene,
-  "Germany": GermanyScene,
-  "Norway": NorwayScene,
-  "Japan": JapanScene,
-  "China": ChinaScene,
-  "Disney World": DisneyScene,
-  "Edinburgh": EdinburghScene,
-  "India": IndiaScene,
+const PARTICLE_FOR: Record<string, string> = {
+  Paris: "❤️", Switzerland: "❄️", Italy: "✨", Germany: "🍂",
+  Norway: "✦", Japan: "🌸", China: "🏮", "Disney World": "✨",
+  Edinburgh: "💧", India: "🪔",
 };
 
-function Diorama({ name, color }: { name: string; color: string }) {
-  const Scene = SCENES[name] ?? ParisScene;
-  return <Scene color={color} />;
-}
-
-
-function WorldTour() {
+function WorldTourScene() {
   const [active, setActive] = useState<string | null>(null);
   const current = PLACES.find(p => p.name === active);
   return (
-    <section className="relative min-h-screen overflow-hidden py-24">
+    <div className="relative h-full w-full overflow-hidden">
       <NebulaBlobs />
-      <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
-        <div className="mb-2 text-xs uppercase tracking-[0.5em] text-white/60">Chapter VI</div>
-        <h2 className="text-gradient-rose text-5xl font-light sm:text-6xl">World Tour Together</h2>
-        <p className="mt-3 text-white/60">Tap a dream destination — each opens a tiny 3D world.</p>
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+        <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter V</div>
+        <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">World Tour Together</h2>
+        <p className="mt-2 text-sm text-white/60">Tap a dream destination — each opens its own tiny world.</p>
 
-        <div className="relative mx-auto mt-14 h-[520px] w-[520px] max-w-full">
+        <div className="relative mt-6 flex-1 w-full max-w-[560px] aspect-square">
           <div className="absolute inset-0 rounded-full opacity-70 blur-3xl"
             style={{ background: "radial-gradient(circle, oklch(0.55 0.25 340 / 0.7), transparent 70%)" }} />
-          {/* Globe */}
           <div className="relative h-full w-full">
-            <div className="animate-spin-slow absolute inset-0 rounded-full border border-white/10"
+            <div className="animate-spin-slow absolute inset-[10%] rounded-full border border-white/10"
               style={{
                 background: "radial-gradient(circle at 30% 30%, oklch(0.45 0.18 280), oklch(0.18 0.10 270) 70%)",
                 boxShadow: "inset -40px -40px 100px oklch(0 0 0 / 0.6), 0 0 80px oklch(0.55 0.25 320 / 0.5)",
@@ -788,21 +538,19 @@ function WorldTour() {
                   style={{ top: `${t}%`, width: "96%", height: "8%" }} />
               ))}
             </div>
-            {/* Place markers around globe */}
             {PLACES.map((p, i) => {
               const angle = (i / PLACES.length) * Math.PI * 2;
-              const r = 240;
-              const x = Math.cos(angle) * r;
-              const y = Math.sin(angle) * r;
+              const x = Math.cos(angle) * 44;
+              const y = Math.sin(angle) * 44;
               return (
                 <button key={p.name} onClick={() => setActive(p.name)}
-                  className="group absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                  style={{ transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))` }}>
+                  className="group absolute left-1/2 top-1/2"
+                  style={{ transform: `translate(calc(-50% + ${x}%), calc(-50% + ${y}%))` }}>
                   <div className="relative">
-                    <span className="absolute -inset-3 animate-ping rounded-full bg-rose/40" />
-                    <span className="relative grid h-12 w-12 place-items-center rounded-full glass-card text-xl transition group-hover:scale-125"
-                      style={{ boxShadow: `0 0 20px ${p.color}` }}>{p.landmark}</span>
-                    <span className="mt-1 block text-[11px] text-white/80">{p.name}</span>
+                    <span className="absolute -inset-2 animate-ping rounded-full bg-rose/40" />
+                    <span className="relative grid h-10 w-10 place-items-center rounded-full glass-card text-base transition group-hover:scale-125"
+                      style={{ boxShadow: `0 0 20px ${p.color}` }}>{p.flag}</span>
+                    <span className="mt-1 block whitespace-nowrap text-[10px] text-white/80">{p.name}</span>
                   </div>
                 </button>
               );
@@ -813,24 +561,20 @@ function WorldTour() {
 
       <AnimatePresence>
         {active && current && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setActive(null)}
             className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6">
-            <motion.div
-              initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85 }}
-              transition={{ type: "spring", damping: 20 }}
-              onClick={(e) => e.stopPropagation()}
+            <motion.div initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85 }}
+              transition={{ type: "spring", damping: 20 }} onClick={(e) => e.stopPropagation()}
               className="glass-card max-w-md rounded-3xl p-8 text-center"
               style={{ boxShadow: "var(--shadow-glow-pink)" }}>
-              <div className="text-xs uppercase tracking-[0.4em] text-white/60">{current.flag} Destination</div>
-              <div className="mt-2 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{current.name}</div>
+              <div className="text-xs uppercase tracking-[0.4em] text-white/60">{current.flag} {current.landmark}</div>
+              <div className="mt-1 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{current.name}</div>
               <div className="my-6">
-                <Diorama name={current.name} color={current.color} />
+                <PlaceDiorama img={current.img} color={current.color}
+                  particles={PARTICLE_FOR[current.name] ?? "✨"} />
               </div>
-              <p className="text-white/80 italic">
-                "One day, Flamobita and Snowy Owgy will be here together."
-              </p>
+              <p className="text-white/80 italic">"One day, Flamobita and Snowy Owgy will be here together."</p>
               <button onClick={() => setActive(null)}
                 className="mt-6 rounded-full px-5 py-2 text-xs uppercase tracking-[0.3em] text-white"
                 style={{ background: "var(--gradient-nebula)" }}>Close</button>
@@ -838,21 +582,19 @@ function WorldTour() {
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </div>
   );
 }
 
-
-/* ---------- Section 7: Birthday Constellations ---------- */
+/* ---------------- Scene 6: Birthday Constellations ---------------- */
 function Constellation({ title, date, points }: { title: string; date: string; points: [number, number][] }) {
   const w = 320, h = 280;
-  // build heart path
   const path = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p[0]} ${p[1]}`).join(" ");
   return (
     <div className="text-center">
       <div className="text-xs uppercase tracking-[0.4em] text-white/60">{date}</div>
       <div className="mt-1 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>{title}</div>
-      <svg viewBox={`0 0 ${w} ${h}`} className="mt-3 w-full max-w-xs">
+      <svg viewBox={`0 0 ${w} ${h}`} className="mt-3 w-full max-w-[260px]">
         <defs>
           <filter id={`glow-${title}`}>
             <feGaussianBlur stdDeviation="3" result="b" />
@@ -870,8 +612,7 @@ function Constellation({ title, date, points }: { title: string; date: string; p
   );
 }
 
-function BirthdayConstellations() {
-  // heart-shape points
+function BirthdayConstellationsScene() {
   const heart = (cx: number, cy: number, s: number): [number, number][] => {
     const pts: [number, number][] = [];
     for (let i = 0; i < 14; i++) {
@@ -883,9 +624,8 @@ function BirthdayConstellations() {
     return pts;
   };
   return (
-    <section className="relative min-h-screen overflow-hidden py-24">
+    <div className="relative h-full w-full overflow-hidden">
       <div className="absolute inset-0"><Starfield density={200} /></div>
-      {/* shooting stars */}
       {Array.from({ length: 4 }).map((_, i) => (
         <span key={i}
           className="absolute h-0.5 w-32 rounded-full bg-gradient-to-r from-white to-transparent"
@@ -895,21 +635,20 @@ function BirthdayConstellations() {
             boxShadow: "0 0 20px white",
           }} />
       ))}
-      <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
-        <div className="mb-2 text-xs uppercase tracking-[0.5em] text-white/60">Chapter VII</div>
-        <h2 className="text-gradient-rose text-5xl font-light sm:text-6xl">Birthday Constellations</h2>
-        <p className="mt-3 text-white/60">Two stars, written into the sky.</p>
-
-        <div className="mt-16 grid gap-12 sm:grid-cols-2">
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+        <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter VI</div>
+        <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Birthday Constellations</h2>
+        <p className="mt-2 text-sm text-white/60">Two stars, written into the sky.</p>
+        <div className="mt-8 grid w-full flex-1 place-items-center gap-8 sm:grid-cols-2">
           <Constellation title="Flamobita" date="February 6" points={heart(160, 150, 7)} />
           <Constellation title="Snowy Owgy" date="August 1" points={heart(160, 150, 7)} />
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- Section 8: Letter ---------- */
+/* ---------------- Scene 7: Letter ---------------- */
 const LETTER = `My dearest Snowy Owgy,
 
 If the night sky is just a page, then I have spent every star writing your name. I built this whole universe so you can wander through it and feel — even for a second — how impossibly lucky I am to know you.
@@ -921,27 +660,16 @@ Tum pookiee ho. Tum barbiee ho. And in every life, every universe, every quiet l
 Yours, across every orbit,
 Flamobita ❤`;
 
-function LetterSection() {
+function LetterScene() {
   const [shown, setShown] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        let i = 0;
-        const id = setInterval(() => {
-          i += 2; setShown(i);
-          if (i >= LETTER.length) clearInterval(id);
-        }, 22);
-        obs.disconnect();
-      }
-    }, { threshold: 0.3 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
+    let i = 0;
+    const id = setInterval(() => { i += 2; setShown(i); if (i >= LETTER.length) clearInterval(id); }, 22);
+    return () => clearInterval(id);
   }, []);
   return (
-    <section ref={ref} className="relative min-h-screen overflow-hidden py-24">
+    <div className="relative h-full w-full overflow-y-auto">
       <NebulaBlobs />
-      {/* floating particles */}
       {Array.from({ length: 18 }).map((_, i) => (
         <span key={i} className="animate-float-y absolute h-1.5 w-1.5 rounded-full bg-rose/70"
           style={{
@@ -950,85 +678,162 @@ function LetterSection() {
             boxShadow: "0 0 12px oklch(0.85 0.2 340)",
           }} />
       ))}
-      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
-        <div className="mb-2 text-xs uppercase tracking-[0.5em] text-white/60">Chapter VIII</div>
-        <h2 className="text-gradient-rose text-5xl font-light sm:text-6xl">A Letter from Flamobita</h2>
+      <div className="relative z-10 mx-auto max-w-3xl px-6 pt-10 text-center">
+        <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter VII</div>
+        <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">A Letter from Flamobita</h2>
       </div>
-      <div className="relative z-10 mx-auto mt-12 max-w-2xl px-6">
-        <div className="paper-texture rounded-3xl p-10 text-left text-stone-800 shadow-2xl"
+      <div className="relative z-10 mx-auto mt-8 max-w-2xl px-6 pb-12">
+        <div className="paper-texture rounded-3xl p-8 text-left text-stone-800 shadow-2xl"
           style={{ boxShadow: "0 0 100px oklch(0.75 0.20 340 / 0.4), 0 30px 60px oklch(0 0 0 / 0.5)", fontFamily: "var(--font-hand)" }}>
-          <pre className="whitespace-pre-wrap text-xl leading-relaxed sm:text-2xl">
+          <pre className="whitespace-pre-wrap text-lg leading-relaxed sm:text-xl">
             {LETTER.slice(0, shown)}
             <span className="ml-0.5 inline-block h-5 w-0.5 animate-pulse bg-stone-700 align-middle" />
           </pre>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- Section 9: Final Ending ---------- */
-function FinalEnding() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.4, 2.2]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0.4]);
+/* ---------------- Scene 8: Final ---------------- */
+function FinalScene() {
   return (
-    <section ref={ref} className="relative min-h-[140vh] overflow-hidden">
-      <motion.div style={{ scale }} className="absolute inset-0">
-        <Starfield density={300} />
-      </motion.div>
+    <div className="relative h-full w-full overflow-hidden">
+      <div className="absolute inset-0"><Starfield density={300} /></div>
       <NebulaBlobs />
-      <div className="sticky top-0 flex h-screen flex-col items-center justify-center px-6 text-center">
-        <motion.div style={{ opacity }} className="space-y-12">
-          <motion.p
-            initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.8 }}
-            transition={{ duration: 1.5 }}
-            className="text-3xl font-light text-white/90 sm:text-4xl" style={{ fontFamily: "var(--font-display)" }}>
-            Thank you for being part of my universe.
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: false, amount: 0.6 }}
-            transition={{ duration: 1.5, delay: 0.4 }}
-            className="text-gradient-rose text-6xl font-light sm:text-7xl">
-            Flamobita ❤ Snowy Owgy
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-            viewport={{ once: false, amount: 0.4 }}
-            transition={{ duration: 1.8, delay: 0.8 }}
-            className="mx-auto max-w-xl text-lg italic text-white/70">
-            No matter where life takes us,<br />this universe will always exist.
-          </motion.p>
-        </motion.div>
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
+        <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5 }}
+          className="text-2xl font-light text-white/90 sm:text-4xl" style={{ fontFamily: "var(--font-display)" }}>
+          Thank you for being part of my universe.
+        </motion.p>
+        <motion.p initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, delay: 0.4 }}
+          className="text-gradient-rose mt-8 text-5xl font-light sm:text-7xl">
+          Flamobita ❤ Snowy Owgy
+        </motion.p>
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 1.8, delay: 0.8 }}
+          className="mx-auto mt-8 max-w-xl text-base italic text-white/70 sm:text-lg">
+          No matter where life takes us,<br />this universe will always exist.
+        </motion.p>
       </div>
-    </section>
+    </div>
   );
 }
 
-/* ---------- Master Component ---------- */
+/* ---------------- Guided Cinematic Shell ---------------- */
+type SceneDef = { id: string; title: string; render: () => React.ReactElement };
+
+const SCENES: SceneDef[] = [
+  { id: "universe",   title: "Our Universe",         render: () => <UniverseScene /> },
+  { id: "chat",       title: "Chat Galaxy",          render: () => <ChatGalaxyScene /> },
+  { id: "stickers",   title: "Sticker Kingdom",      render: () => <StickerKingdomScene /> },
+  { id: "memories",   title: "Memory Vault",         render: () => <MemoryVaultScene /> },
+  { id: "tour",       title: "World Tour",           render: () => <WorldTourScene /> },
+  { id: "stars",      title: "Birthday Constellations", render: () => <BirthdayConstellationsScene /> },
+  { id: "letter",     title: "A Letter",             render: () => <LetterScene /> },
+  { id: "final",      title: "Forever",              render: () => <FinalScene /> },
+];
+
+function CinematicShell() {
+  const [idx, setIdx] = useState(0);
+  const [dir, setDir] = useState(1);
+  const total = SCENES.length;
+
+  const go = useCallback((next: number) => {
+    if (next < 0 || next >= total) return;
+    setDir(next > idx ? 1 : -1);
+    setIdx(next);
+  }, [idx, total]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" || e.key === " ") go(idx + 1);
+      if (e.key === "ArrowLeft") go(idx - 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [idx, go]);
+
+  const scene = SCENES[idx];
+
+  return (
+    <div className="fixed inset-0 z-30">
+      <AnimatePresence mode="wait" custom={dir}>
+        <motion.div
+          key={scene.id} custom={dir}
+          initial={{ opacity: 0, scale: 1.04, filter: "blur(10px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 0.98, filter: "blur(8px)" }}
+          transition={{ duration: 0.9, ease: [0.7, 0, 0.3, 1] }}
+          className="absolute inset-0"
+        >
+          {scene.render()}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Top progress / chapters */}
+      <div className="pointer-events-auto absolute left-1/2 top-4 z-50 -translate-x-1/2">
+        <div className="glass-card flex items-center gap-1.5 rounded-full px-3 py-2">
+          {SCENES.map((s, i) => (
+            <button key={s.id} onClick={() => go(i)}
+              aria-label={s.title}
+              className="group relative h-2 rounded-full transition-all"
+              style={{
+                width: i === idx ? 28 : 8,
+                background: i === idx ? "var(--gradient-nebula)" : "rgba(255,255,255,0.25)",
+                boxShadow: i === idx ? "0 0 16px oklch(0.78 0.22 340)" : undefined,
+              }}>
+              <span className="pointer-events-none absolute left-1/2 top-full mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-full bg-black/70 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-white/80 group-hover:block">
+                {s.title}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Side navigation */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-40 flex items-center px-2 sm:px-4">
+        <button
+          onClick={() => go(idx - 1)} disabled={idx === 0}
+          className="pointer-events-auto glass-card grid h-12 w-12 place-items-center rounded-full text-xl text-white/85 transition hover:scale-110 disabled:opacity-30"
+          aria-label="Previous">‹</button>
+      </div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-40 flex items-center px-2 sm:px-4">
+        <button
+          onClick={() => go(idx + 1)} disabled={idx === total - 1}
+          className="pointer-events-auto glass-card grid h-12 w-12 place-items-center rounded-full text-xl text-white/85 transition hover:scale-110 disabled:opacity-30"
+          style={{ boxShadow: "var(--shadow-glow-pink)" }}
+          aria-label="Next">›</button>
+      </div>
+
+      {/* Bottom label */}
+      <div className="pointer-events-none absolute bottom-4 left-1/2 z-40 -translate-x-1/2 text-center">
+        <div className="text-[10px] uppercase tracking-[0.4em] text-white/50">
+          Chapter {idx + 1} of {total} · {scene.title}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Master ---------------- */
 function OurUniverse() {
   const [entered, setEntered] = useState(false);
   const enter = () => {
-    setEntered(true);
     window.dispatchEvent(new Event("play-music"));
-    setTimeout(() => {
-      document.getElementById("universe")?.scrollIntoView({ behavior: "smooth" });
-    }, 1200);
+    setEntered(true);
   };
 
   return (
-    <div className="relative">
+    <div className="relative h-screen w-screen overflow-hidden">
       <MusicPlayer />
 
-      {/* Camera-zoom transition overlay */}
       <AnimatePresence>
         {entered && (
           <motion.div
-            initial={{ scale: 0, opacity: 1 }}
-            animate={{ scale: 30, opacity: 0 }}
+            initial={{ scale: 0, opacity: 1 }} animate={{ scale: 30, opacity: 0 }}
             transition={{ duration: 1.6, ease: [0.7, 0, 0.3, 1] }}
             className="pointer-events-none fixed left-1/2 top-1/2 z-[60] h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{ background: "var(--gradient-nebula)", boxShadow: "var(--shadow-glow-pink)" }}
@@ -1036,15 +841,13 @@ function OurUniverse() {
         )}
       </AnimatePresence>
 
-      <WelcomePortal onEnter={enter} />
-      <div id="universe"><UniverseSection /></div>
-      <ChatGalaxy />
-      <StickerKingdom />
-      <MemoryVault />
-      <WorldTour />
-      <BirthdayConstellations />
-      <LetterSection />
-      <FinalEnding />
+      {!entered && (
+        <div className="fixed inset-0 z-20">
+          <WelcomePortal onEnter={enter} />
+        </div>
+      )}
+
+      {entered && <CinematicShell />}
     </div>
   );
 }
