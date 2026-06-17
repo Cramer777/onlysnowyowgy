@@ -2,6 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import couplePhoto from "@/assets/couple-cosmic.jpg";
+import memTogether from "@/assets/memory-together.jpg";
+import memBees from "@/assets/memory-bees.jpg";
+import memCilantro from "@/assets/memory-cilantro.jpg";
+import memPrincess from "@/assets/memory-princess.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
