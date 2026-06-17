@@ -462,22 +462,87 @@ function MemoryVault() {
 
 /* ---------- Section 6: World Tour Globe ---------- */
 const PLACES = [
-  { name: "Paris", flag: "🇫🇷" }, { name: "Switzerland", flag: "🇨🇭" },
-  { name: "Italy", flag: "🇮🇹" }, { name: "Germany", flag: "🇩🇪" },
-  { name: "Norway", flag: "🇳🇴" }, { name: "Japan", flag: "🇯🇵" },
-  { name: "China", flag: "🇨🇳" }, { name: "Disney World", flag: "🏰" },
-  { name: "Edinburgh", flag: "🏴" }, { name: "India", flag: "🇮🇳" },
+  { name: "Paris", flag: "🇫🇷", landmark: "🗼", color: "oklch(0.78 0.18 30)" },
+  { name: "Switzerland", flag: "🇨🇭", landmark: "🏔️", color: "oklch(0.85 0.10 220)" },
+  { name: "Italy", flag: "🇮🇹", landmark: "🏛️", color: "oklch(0.75 0.18 80)" },
+  { name: "Germany", flag: "🇩🇪", landmark: "🏰", color: "oklch(0.70 0.20 60)" },
+  { name: "Norway", flag: "🇳🇴", landmark: "🛶", color: "oklch(0.70 0.20 240)" },
+  { name: "Japan", flag: "🇯🇵", landmark: "⛩️", color: "oklch(0.75 0.22 20)" },
+  { name: "China", flag: "🇨🇳", landmark: "🏯", color: "oklch(0.78 0.20 40)" },
+  { name: "Disney World", flag: "🏰", landmark: "🎡", color: "oklch(0.80 0.22 320)" },
+  { name: "Edinburgh", flag: "🏴", landmark: "🏰", color: "oklch(0.70 0.15 160)" },
+  { name: "India", flag: "🇮🇳", landmark: "🕌", color: "oklch(0.80 0.20 90)" },
 ];
+
+/* Mini 3D landmark — CSS perspective rotating diorama */
+function Miniature3D({ icon, color, size = 220 }: { icon: string; color: string; size?: number }) {
+  return (
+    <div className="relative mx-auto" style={{ width: size, height: size, perspective: 900 }}>
+      {/* glow halo */}
+      <div className="absolute inset-0 rounded-full blur-2xl opacity-70"
+        style={{ background: `radial-gradient(circle, ${color}, transparent 70%)` }} />
+      {/* rotating stage */}
+      <div
+        className="relative h-full w-full"
+        style={{ transformStyle: "preserve-3d", animation: "spin-slow 14s linear infinite" }}
+      >
+        {/* base disc */}
+        <div
+          className="absolute left-1/2 top-[78%] -translate-x-1/2"
+          style={{
+            width: size * 0.8, height: size * 0.8,
+            transform: "rotateX(75deg)",
+            borderRadius: "9999px",
+            background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+            boxShadow: `0 0 60px ${color}`,
+            opacity: 0.55,
+          }}
+        />
+        {/* concentric rings */}
+        {[0.6, 0.75, 0.9].map((s, i) => (
+          <div key={i}
+            className="absolute left-1/2 top-[78%] -translate-x-1/2 rounded-full border border-white/30"
+            style={{
+              width: size * s, height: size * s,
+              transform: `rotateX(75deg) translateZ(${i * 4}px)`,
+              opacity: 0.4 - i * 0.1,
+            }} />
+        ))}
+        {/* landmark icon — floats above disc */}
+        <div
+          className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 animate-float-y"
+          style={{ fontSize: size * 0.5, filter: `drop-shadow(0 10px 24px ${color})`, transform: "translateZ(40px)" }}
+        >
+          {icon}
+        </div>
+        {/* orbiting sparkles */}
+        {Array.from({ length: 6 }).map((_, i) => {
+          const a = (i / 6) * Math.PI * 2;
+          const r = size * 0.42;
+          return (
+            <span key={i}
+              className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-white"
+              style={{
+                transform: `translate(${Math.cos(a) * r}px, ${Math.sin(a) * r * 0.35}px) translateZ(20px)`,
+                boxShadow: "0 0 12px white, 0 0 24px " + color,
+              }} />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function WorldTour() {
   const [active, setActive] = useState<string | null>(null);
+  const current = PLACES.find(p => p.name === active);
   return (
     <section className="relative min-h-screen overflow-hidden py-24">
       <NebulaBlobs />
       <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
         <div className="mb-2 text-xs uppercase tracking-[0.5em] text-white/60">Chapter VI</div>
         <h2 className="text-gradient-rose text-5xl font-light sm:text-6xl">World Tour Together</h2>
-        <p className="mt-3 text-white/60">Tap a dream destination.</p>
+        <p className="mt-3 text-white/60">Tap a dream destination — each opens a tiny 3D world.</p>
 
         <div className="relative mx-auto mt-14 h-[520px] w-[520px] max-w-full">
           <div className="absolute inset-0 rounded-full opacity-70 blur-3xl"
@@ -489,7 +554,6 @@ function WorldTour() {
                 background: "radial-gradient(circle at 30% 30%, oklch(0.45 0.18 280), oklch(0.18 0.10 270) 70%)",
                 boxShadow: "inset -40px -40px 100px oklch(0 0 0 / 0.6), 0 0 80px oklch(0.55 0.25 320 / 0.5)",
               }}>
-              {/* latitude lines */}
               {[20, 40, 60, 80].map(t => (
                 <div key={t} className="absolute left-1/2 -translate-x-1/2 rounded-[50%] border border-white/10"
                   style={{ top: `${t}%`, width: "96%", height: "8%" }} />
@@ -507,8 +571,8 @@ function WorldTour() {
                   style={{ transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))` }}>
                   <div className="relative">
                     <span className="absolute -inset-3 animate-ping rounded-full bg-rose/40" />
-                    <span className="relative grid h-10 w-10 place-items-center rounded-full glass-card text-lg transition group-hover:scale-125"
-                      style={{ boxShadow: "0 0 20px oklch(0.78 0.22 340 / 0.7)" }}>{p.flag}</span>
+                    <span className="relative grid h-12 w-12 place-items-center rounded-full glass-card text-xl transition group-hover:scale-125"
+                      style={{ boxShadow: `0 0 20px ${p.color}` }}>{p.landmark}</span>
                     <span className="mt-1 block text-[11px] text-white/80">{p.name}</span>
                   </div>
                 </button>
@@ -519,21 +583,28 @@ function WorldTour() {
       </div>
 
       <AnimatePresence>
-        {active && (
+        {active && current && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setActive(null)}
-            className="fixed inset-0 z-50 grid place-items-center bg-black/65 backdrop-blur-xl p-6">
+            className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6">
             <motion.div
               initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85 }}
               transition={{ type: "spring", damping: 20 }}
-              className="glass-card max-w-md rounded-3xl p-10 text-center"
+              onClick={(e) => e.stopPropagation()}
+              className="glass-card max-w-md rounded-3xl p-8 text-center"
               style={{ boxShadow: "var(--shadow-glow-pink)" }}>
-              <div className="text-5xl">{PLACES.find(p => p.name === active)?.flag}</div>
-              <div className="mt-4 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{active}</div>
-              <p className="mt-4 text-white/80">
+              <div className="text-xs uppercase tracking-[0.4em] text-white/60">{current.flag} Destination</div>
+              <div className="mt-2 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{current.name}</div>
+              <div className="my-6">
+                <Miniature3D icon={current.landmark} color={current.color} />
+              </div>
+              <p className="text-white/80 italic">
                 "One day, Flamobita and Snowy Owgy will be here together."
               </p>
+              <button onClick={() => setActive(null)}
+                className="mt-6 rounded-full px-5 py-2 text-xs uppercase tracking-[0.3em] text-white"
+                style={{ background: "var(--gradient-nebula)" }}>Close</button>
             </motion.div>
           </motion.div>
         )}
@@ -541,6 +612,7 @@ function WorldTour() {
     </section>
   );
 }
+
 
 /* ---------- Section 7: Birthday Constellations ---------- */
 function Constellation({ title, date, points }: { title: string; date: string; points: [number, number][] }) {
