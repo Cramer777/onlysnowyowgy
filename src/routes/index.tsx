@@ -2,6 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import couplePhoto from "@/assets/couple-cosmic.jpg";
+import memTogether from "@/assets/memory-together.jpg";
+import memBees from "@/assets/memory-bees.jpg";
+import memCilantro from "@/assets/memory-cilantro.jpg";
+import memPrincess from "@/assets/memory-princess.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -358,12 +362,12 @@ function StickerKingdom() {
 
 /* ---------- Section 5: Memory Vault ---------- */
 const MEMORIES = [
-  { title: "First Hello", note: "Where every star aligned." },
-  { title: "Late Night Calls", note: "When the moon was our witness." },
-  { title: "Endless Laughter", note: "Pookies and Barbies forever." },
-  { title: "Quiet Moments", note: "Silence that said everything." },
-  { title: "Silly Fights", note: "That ended in 🤜🏻🤛🏻." },
-  { title: "Our Forever", note: "Just beginning." },
+  { title: "Us, Together", note: "The day the universe stood still.", img: memTogether },
+  { title: "Honey & Bees", note: "Sweet as the song that played.", img: memBees },
+  { title: "Crowned in Green", note: "Silly, soft, unforgettable.", img: memCilantro },
+  { title: "Little Princess", note: "Born to wear a crown.", img: memPrincess },
+  { title: "Late Night Calls", note: "When the moon was our witness.", img: couplePhoto },
+  { title: "Our Forever", note: "Just beginning.", img: memTogether },
 ];
 
 function MemoryVault() {
@@ -391,11 +395,13 @@ function MemoryVault() {
               className="group glass-card relative h-72 overflow-hidden rounded-3xl text-left"
               style={{ transformStyle: "preserve-3d" }}
             >
-              <div className="absolute inset-0 opacity-80 transition group-hover:opacity-100"
+              <div className="absolute inset-0 transition duration-700 group-hover:scale-110"
                 style={{
-                  background: `linear-gradient(135deg, oklch(0.45 ${0.18 + (i % 3) * 0.04} ${300 + i * 12}) 0%, oklch(0.25 0.12 280) 100%)`,
+                  backgroundImage: `url(${m.img})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
               <div className="relative z-10 flex h-full flex-col justify-end p-6">
                 <div className="text-xs uppercase tracking-[0.3em] text-white/60">Memory {String(i + 1).padStart(2, "0")}</div>
                 <div className="mt-1 text-2xl font-light text-white" style={{ fontFamily: "var(--font-display)" }}>{m.title}</div>
@@ -424,8 +430,10 @@ function MemoryVault() {
               <div className="text-xs uppercase tracking-[0.4em] text-white/60">Memory {String(open + 1).padStart(2, "0")}</div>
               <div className="mt-3 text-4xl text-white" style={{ fontFamily: "var(--font-display)" }}>{MEMORIES[open].title}</div>
               <div className="mt-4 text-white/75">{MEMORIES[open].note}</div>
-              <div className="mt-8 h-64 rounded-2xl"
-                style={{ background: "var(--gradient-nebula)", boxShadow: "var(--shadow-glow-violet)" }} />
+              <div className="mt-8 h-80 overflow-hidden rounded-2xl"
+                style={{ boxShadow: "var(--shadow-glow-violet)" }}>
+                <img src={MEMORIES[open].img} alt={MEMORIES[open].title} className="h-full w-full object-cover" />
+              </div>
             </motion.div>
           </motion.div>
         )}
