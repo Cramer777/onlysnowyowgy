@@ -723,7 +723,7 @@ function FinalScene() {
 }
 
 /* ---------------- Guided Cinematic Shell ---------------- */
-type SceneDef = { id: string; title: string; render: () => JSX.Element };
+type SceneDef = { id: string; title: string; render: () => React.ReactElement };
 
 const SCENES: SceneDef[] = [
   { id: "universe",   title: "Our Universe",         render: () => <UniverseScene /> },
