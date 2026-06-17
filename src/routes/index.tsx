@@ -362,12 +362,12 @@ function StickerKingdom() {
 
 /* ---------- Section 5: Memory Vault ---------- */
 const MEMORIES = [
-  { title: "First Hello", note: "Where every star aligned." },
-  { title: "Late Night Calls", note: "When the moon was our witness." },
-  { title: "Endless Laughter", note: "Pookies and Barbies forever." },
-  { title: "Quiet Moments", note: "Silence that said everything." },
-  { title: "Silly Fights", note: "That ended in 🤜🏻🤛🏻." },
-  { title: "Our Forever", note: "Just beginning." },
+  { title: "Us, Together", note: "The day the universe stood still.", img: memTogether },
+  { title: "Honey & Bees", note: "Sweet as the song that played.", img: memBees },
+  { title: "Crowned in Green", note: "Silly, soft, unforgettable.", img: memCilantro },
+  { title: "Little Princess", note: "Born to wear a crown.", img: memPrincess },
+  { title: "Late Night Calls", note: "When the moon was our witness.", img: couplePhoto },
+  { title: "Our Forever", note: "Just beginning.", img: memTogether },
 ];
 
 function MemoryVault() {
