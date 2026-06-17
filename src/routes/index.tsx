@@ -826,7 +826,7 @@ function WorldTour() {
               <div className="text-xs uppercase tracking-[0.4em] text-white/60">{current.flag} Destination</div>
               <div className="mt-2 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{current.name}</div>
               <div className="my-6">
-                <Miniature3D icon={current.landmark} color={current.color} />
+                <Diorama name={current.name} color={current.color} />
               </div>
               <p className="text-white/80 italic">
                 "One day, Flamobita and Snowy Owgy will be here together."
