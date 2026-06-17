@@ -712,10 +712,12 @@ function OurUniverse() {
   const [entered, setEntered] = useState(false);
   const enter = () => {
     setEntered(true);
+    window.dispatchEvent(new Event("play-music"));
     setTimeout(() => {
       document.getElementById("universe")?.scrollIntoView({ behavior: "smooth" });
     }, 1200);
   };
+
   return (
     <div className="relative">
       <MusicPlayer />
