@@ -395,11 +395,13 @@ function MemoryVault() {
               className="group glass-card relative h-72 overflow-hidden rounded-3xl text-left"
               style={{ transformStyle: "preserve-3d" }}
             >
-              <div className="absolute inset-0 opacity-80 transition group-hover:opacity-100"
+              <div className="absolute inset-0 transition duration-700 group-hover:scale-110"
                 style={{
-                  background: `linear-gradient(135deg, oklch(0.45 ${0.18 + (i % 3) * 0.04} ${300 + i * 12}) 0%, oklch(0.25 0.12 280) 100%)`,
+                  backgroundImage: `url(${m.img})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
               <div className="relative z-10 flex h-full flex-col justify-end p-6">
                 <div className="text-xs uppercase tracking-[0.3em] text-white/60">Memory {String(i + 1).padStart(2, "0")}</div>
                 <div className="mt-1 text-2xl font-light text-white" style={{ fontFamily: "var(--font-display)" }}>{m.title}</div>
