@@ -474,64 +474,293 @@ const PLACES = [
   { name: "India", flag: "🇮🇳", landmark: "🕌", color: "oklch(0.80 0.20 90)" },
 ];
 
-/* Mini 3D landmark — CSS perspective rotating diorama */
-function Miniature3D({ icon, color, size = 220 }: { icon: string; color: string; size?: number }) {
+/* ---------- Per-place diorama scenes ---------- */
+type SceneProps = { color: string };
+
+function SceneStage({
+  sky, ground, glow, children,
+}: { sky: string; ground: string; glow: string; children: React.ReactNode }) {
   return (
-    <div className="relative mx-auto" style={{ width: size, height: size, perspective: 900 }}>
-      {/* glow halo */}
-      <div className="absolute inset-0 rounded-full blur-2xl opacity-70"
-        style={{ background: `radial-gradient(circle, ${color}, transparent 70%)` }} />
-      {/* rotating stage */}
-      <div
-        className="relative h-full w-full"
-        style={{ transformStyle: "preserve-3d", animation: "spin-slow 14s linear infinite" }}
-      >
-        {/* base disc */}
-        <div
-          className="absolute left-1/2 top-[78%] -translate-x-1/2"
-          style={{
-            width: size * 0.8, height: size * 0.8,
-            transform: "rotateX(75deg)",
-            borderRadius: "9999px",
-            background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
-            boxShadow: `0 0 60px ${color}`,
-            opacity: 0.55,
-          }}
-        />
-        {/* concentric rings */}
-        {[0.6, 0.75, 0.9].map((s, i) => (
-          <div key={i}
-            className="absolute left-1/2 top-[78%] -translate-x-1/2 rounded-full border border-white/30"
-            style={{
-              width: size * s, height: size * s,
-              transform: `rotateX(75deg) translateZ(${i * 4}px)`,
-              opacity: 0.4 - i * 0.1,
-            }} />
-        ))}
-        {/* landmark icon — floats above disc */}
-        <div
-          className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 animate-float-y"
-          style={{ fontSize: size * 0.5, filter: `drop-shadow(0 10px 24px ${color})`, transform: "translateZ(40px)" }}
-        >
-          {icon}
-        </div>
-        {/* orbiting sparkles */}
-        {Array.from({ length: 6 }).map((_, i) => {
-          const a = (i / 6) * Math.PI * 2;
-          const r = size * 0.42;
-          return (
-            <span key={i}
-              className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-white"
-              style={{
-                transform: `translate(${Math.cos(a) * r}px, ${Math.sin(a) * r * 0.35}px) translateZ(20px)`,
-                boxShadow: "0 0 12px white, 0 0 24px " + color,
-              }} />
-          );
-        })}
+    <motion.div
+      className="relative mx-auto overflow-hidden rounded-3xl"
+      style={{
+        width: 320, height: 240, perspective: 1000,
+        background: sky,
+        boxShadow: `inset 0 -40px 80px ${glow}, 0 20px 60px ${glow}`,
+      }}
+      animate={{ rotateY: [-6, 6, -6], rotateX: [-2, 2, -2] }}
+      transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+    >
+      {/* ambient light */}
+      <div className="pointer-events-none absolute inset-0"
+        style={{ background: `radial-gradient(ellipse at 50% 30%, ${glow}, transparent 65%)` }} />
+      {/* ground */}
+      <div className="absolute inset-x-0 bottom-0 h-[38%]"
+        style={{ background: ground, transform: "translateZ(0)" }} />
+      <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
+        {children}
       </div>
-    </div>
+    </motion.div>
   );
 }
+
+function Particles({
+  count, emoji, color, drift = "down", size = 14,
+}: { count: number; emoji?: string; color?: string; drift?: "down" | "up" | "float"; size?: number }) {
+  const dir = drift === "up" ? -1 : 1;
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => {
+        const left = (i * 53 + 11) % 100;
+        const delay = (i * 0.37) % 4;
+        const dur = 4 + ((i * 1.3) % 5);
+        return (
+          <motion.span key={i}
+            className="absolute"
+            style={{
+              left: `${left}%`, top: drift === "up" ? "100%" : "-10%",
+              fontSize: size,
+              filter: color ? `drop-shadow(0 0 6px ${color})` : undefined,
+            }}
+            animate={{
+              y: drift === "float" ? [0, -20, 0] : [0, dir * 280],
+              x: [0, ((i % 2 === 0 ? 1 : -1) * 30)],
+              opacity: drift === "float" ? [0.4, 1, 0.4] : [0, 1, 0],
+              rotate: [0, 180],
+            }}
+            transition={{ duration: dur, repeat: Infinity, delay, ease: "linear" }}
+          >
+            {emoji ?? "•"}
+          </motion.span>
+        );
+      })}
+    </>
+  );
+}
+
+function Prop({
+  children, x, y, z = 0, scale = 1, delay = 0,
+}: { children: React.ReactNode; x: number; y: number; z?: number; scale?: number; delay?: number }) {
+  return (
+    <motion.div
+      className="absolute"
+      style={{
+        left: `${x}%`, top: `${y}%`,
+        transform: `translate(-50%, -50%) translateZ(${z}px) scale(${scale})`,
+        fontSize: 64,
+      }}
+      animate={{ y: [0, -6, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function ParisScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.55 0.18 350), oklch(0.78 0.18 30) 60%, oklch(0.88 0.10 70))"
+      ground="linear-gradient(180deg, oklch(0.40 0.08 30), oklch(0.20 0.05 30))"
+      glow={color}
+    >
+      {/* sun */}
+      <div className="absolute left-[70%] top-[30%] h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{ background: "radial-gradient(circle, white, " + color + " 60%, transparent 80%)", filter: "blur(2px)" }} />
+      <Prop x={50} y={58} z={60} scale={1.4}>🗼</Prop>
+      <Prop x={20} y={75} z={20} scale={0.8} delay={0.6}>🏛️</Prop>
+      <Prop x={82} y={78} z={20} scale={0.7} delay={1.2}>🌳</Prop>
+      <Particles count={10} emoji="❤️" color={color} drift="float" size={12} />
+      <Particles count={14} emoji="✨" color="white" drift="float" size={10} />
+    </SceneStage>
+  );
+}
+
+function SwitzerlandScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.70 0.10 240), oklch(0.90 0.05 220))"
+      ground="linear-gradient(180deg, oklch(0.85 0.04 220), oklch(0.95 0.02 220))"
+      glow={color}
+    >
+      <Prop x={30} y={55} z={40} scale={1.6}>🏔️</Prop>
+      <Prop x={65} y={50} z={70} scale={1.8} delay={0.4}>🏔️</Prop>
+      <Prop x={50} y={82} z={20} scale={0.9} delay={0.8}>🏠</Prop>
+      <Prop x={15} y={85} z={10} scale={0.7}>🌲</Prop>
+      <Prop x={85} y={85} z={10} scale={0.7} delay={1}>🌲</Prop>
+      <Particles count={20} emoji="❄️" color="white" drift="down" size={12} />
+    </SceneStage>
+  );
+}
+
+function ItalyScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.55 0.15 50), oklch(0.85 0.15 80))"
+      ground="linear-gradient(180deg, oklch(0.45 0.10 60), oklch(0.25 0.06 50))"
+      glow={color}
+    >
+      <Prop x={50} y={55} z={60} scale={1.5}>🏛️</Prop>
+      <Prop x={20} y={78} z={20} scale={0.8}>🍝</Prop>
+      <Prop x={80} y={78} z={20} scale={0.8} delay={0.6}>🍷</Prop>
+      <Particles count={16} emoji="✨" color={color} drift="float" size={10} />
+    </SceneStage>
+  );
+}
+
+function GermanyScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.40 0.08 50), oklch(0.75 0.15 60))"
+      ground="linear-gradient(180deg, oklch(0.35 0.10 140), oklch(0.18 0.06 140))"
+      glow={color}
+    >
+      <Prop x={50} y={50} z={70} scale={1.6}>🏰</Prop>
+      <Prop x={18} y={80} z={20} scale={0.7}>🌲</Prop>
+      <Prop x={82} y={80} z={20} scale={0.7} delay={0.5}>🌲</Prop>
+      <Prop x={50} y={85} z={30} scale={0.8} delay={1}>🍺</Prop>
+      <Particles count={12} emoji="🍂" color={color} drift="down" size={14} />
+    </SceneStage>
+  );
+}
+
+function NorwayScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.20 0.10 260), oklch(0.35 0.15 200))"
+      ground="linear-gradient(180deg, oklch(0.25 0.08 240), oklch(0.12 0.05 250))"
+      glow={color}
+    >
+      {/* aurora ribbons */}
+      {[0, 1, 2].map(i => (
+        <motion.div key={i}
+          className="absolute inset-x-0 h-24 blur-2xl"
+          style={{
+            top: `${10 + i * 8}%`,
+            background: `linear-gradient(90deg, transparent, oklch(0.75 0.20 ${150 + i * 40}), transparent)`,
+            opacity: 0.6,
+          }}
+          animate={{ x: [-40, 40, -40] }}
+          transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+      <Prop x={30} y={70} z={50} scale={1.4}>🏔️</Prop>
+      <Prop x={70} y={75} z={30} scale={1.1} delay={0.6}>🛶</Prop>
+      <Particles count={20} emoji="✦" color="white" drift="float" size={10} />
+    </SceneStage>
+  );
+}
+
+function JapanScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.75 0.15 350), oklch(0.90 0.10 20))"
+      ground="linear-gradient(180deg, oklch(0.55 0.12 20), oklch(0.30 0.08 20))"
+      glow={color}
+    >
+      <div className="absolute left-[25%] top-[28%] h-14 w-14 rounded-full"
+        style={{ background: color, filter: "blur(1px)", boxShadow: `0 0 40px ${color}` }} />
+      <Prop x={55} y={58} z={60} scale={1.5}>⛩️</Prop>
+      <Prop x={20} y={78} z={20} scale={0.9}>🌸</Prop>
+      <Prop x={82} y={80} z={20} scale={0.9} delay={0.7}>🎏</Prop>
+      <Particles count={22} emoji="🌸" color={color} drift="down" size={14} />
+    </SceneStage>
+  );
+}
+
+function ChinaScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.30 0.12 30), oklch(0.65 0.20 40))"
+      ground="linear-gradient(180deg, oklch(0.35 0.12 30), oklch(0.18 0.08 30))"
+      glow={color}
+    >
+      <Prop x={50} y={55} z={60} scale={1.5}>🏯</Prop>
+      <Prop x={18} y={45} z={40} scale={1} delay={0.3}>🏮</Prop>
+      <Prop x={82} y={50} z={40} scale={1} delay={0.9}>🏮</Prop>
+      <Prop x={50} y={85} z={20} scale={0.8} delay={1.5}>🐉</Prop>
+      <Particles count={14} emoji="✨" color={color} drift="up" size={12} />
+    </SceneStage>
+  );
+}
+
+function DisneyScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.30 0.18 290), oklch(0.65 0.22 320))"
+      ground="linear-gradient(180deg, oklch(0.45 0.18 320), oklch(0.20 0.10 300))"
+      glow={color}
+    >
+      <Prop x={50} y={55} z={70} scale={1.6}>🏰</Prop>
+      <Prop x={22} y={45} z={40} scale={1.2} delay={0.4}>🎡</Prop>
+      <Prop x={80} y={48} z={40} scale={1.1} delay={0.8}>🎠</Prop>
+      {/* fireworks */}
+      {[15, 50, 85].map((x, i) => (
+        <motion.div key={i}
+          className="absolute"
+          style={{ left: `${x}%`, top: "25%", fontSize: 28 }}
+          animate={{ scale: [0, 1.4, 0], opacity: [0, 1, 0] }}
+          transition={{ duration: 2.2, repeat: Infinity, delay: i * 0.7 }}
+        >🎆</motion.div>
+      ))}
+      <Particles count={18} emoji="✨" color={color} drift="float" size={12} />
+    </SceneStage>
+  );
+}
+
+function EdinburghScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.30 0.05 240), oklch(0.55 0.08 160))"
+      ground="linear-gradient(180deg, oklch(0.35 0.08 150), oklch(0.18 0.05 150))"
+      glow={color}
+    >
+      <Prop x={50} y={52} z={60} scale={1.5}>🏰</Prop>
+      <Prop x={20} y={80} z={20} scale={0.8}>🌲</Prop>
+      <Prop x={80} y={82} z={20} scale={0.8} delay={0.6}>🐑</Prop>
+      {/* mist */}
+      <motion.div className="absolute inset-x-0 top-[40%] h-16 blur-2xl"
+        style={{ background: "linear-gradient(90deg, transparent, white, transparent)", opacity: 0.25 }}
+        animate={{ x: [-60, 60, -60] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
+      <Particles count={18} emoji="💧" color="white" drift="down" size={10} />
+    </SceneStage>
+  );
+}
+
+function IndiaScene({ color }: SceneProps) {
+  return (
+    <SceneStage
+      sky="linear-gradient(180deg, oklch(0.40 0.18 40), oklch(0.85 0.20 80))"
+      ground="linear-gradient(180deg, oklch(0.45 0.15 60), oklch(0.20 0.08 50))"
+      glow={color}
+    >
+      <Prop x={50} y={55} z={70} scale={1.6}>🕌</Prop>
+      <Prop x={18} y={78} z={30} scale={0.9}>🪔</Prop>
+      <Prop x={82} y={78} z={30} scale={0.9} delay={0.6}>🪔</Prop>
+      <Prop x={50} y={88} z={20} scale={0.7} delay={1}>🌺</Prop>
+      <Particles count={20} emoji="✨" color={color} drift="up" size={12} />
+    </SceneStage>
+  );
+}
+
+const SCENES: Record<string, React.FC<SceneProps>> = {
+  "Paris": ParisScene,
+  "Switzerland": SwitzerlandScene,
+  "Italy": ItalyScene,
+  "Germany": GermanyScene,
+  "Norway": NorwayScene,
+  "Japan": JapanScene,
+  "China": ChinaScene,
+  "Disney World": DisneyScene,
+  "Edinburgh": EdinburghScene,
+  "India": IndiaScene,
+};
+
+function Diorama({ name, color }: { name: string; color: string }) {
+  const Scene = SCENES[name] ?? ParisScene;
+  return <Scene color={color} />;
+}
+
 
 function WorldTour() {
   const [active, setActive] = useState<string | null>(null);
