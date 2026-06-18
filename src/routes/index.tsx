@@ -390,14 +390,16 @@ function StickerKingdomScene() {
 }
 
 /* ---------------- Scene 4: Memory Vault ---------------- */
-const MEMORIES = [
-  { title: "Us, Together", note: "The day the universe stood still.", img: couplePhoto.url },
-  { title: "You Make My Heart", note: "Hand-built into a tiny heart.", img: girlHeart.url },
-  { title: "My Pookie", note: "Soft, silly, perfect.", img: girlGingham.url },
-  { title: "Don't Mess With Snowy", note: "Cute. Dangerous. Iconic.", img: girlKnife.url },
-  { title: "Giggles & Glasses", note: "Your laugh is my favorite song.", img: girlGiggle.url },
-  { title: "Achaa…", note: "That look. Every time.", img: girlAcha.url },
-  { title: "Awwwww 🌷", note: "Maximum cuteness overload.", img: girlAww.url },
+const MEMORY_META = [
+  { title: "Our Moment", note: "A frame I never want to forget." },
+  { title: "Just You", note: "Stars envy the way you smile." },
+  { title: "Soft Light", note: "Even the sun pauses for you." },
+  { title: "Together", note: "Two hearts, one orbit." },
+  { title: "Forever Pose", note: "Bottled this minute for life." },
+  { title: "Golden Hour", note: "The day glowed because of you." },
+  { title: "Snap of Us", note: "Captured in a heartbeat." },
+];
+const MEMORIES = PHOTOS.map((p, i) => ({ ...MEMORY_META[i], img: p.url }));
 ];
 
 function MemoryVaultScene() {
