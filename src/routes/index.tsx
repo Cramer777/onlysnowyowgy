@@ -187,7 +187,7 @@ function TiltPhoto() {
         className="animate-float-y relative h-[360px] w-[300px] overflow-hidden rounded-[2rem] sm:h-[520px] sm:w-[420px]">
         <div className="absolute -inset-1 rounded-[2.2rem] opacity-90 blur-2xl"
           style={{ background: "var(--gradient-nebula)" }} />
-        <img src={couplePhoto.url} alt="Flamobita and Snowy Owgy"
+        <img src={p6.url} alt="Flamobita and Snowy Owgy"
           className="relative h-full w-full rounded-[2rem] object-cover"
           style={{ boxShadow: "var(--shadow-glow-pink)" }} />
         {Array.from({ length: 12 }).map((_, i) => (
