@@ -22,9 +22,12 @@ import p4 from "@/assets/photos/1780219237742.jpg.asset.json";
 import p5 from "@/assets/photos/1781427501184.jpg.asset.json";
 import p6 from "@/assets/photos/IMG_20260112_065136.jpg.asset.json";
 import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
+import coupleHero from "@/assets/photos/couple-hero.jpg.asset.json";
 
 const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
 const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
+// Per-photo focal point to keep faces in frame
+const PHOTO_POS = ["center", "center", "center", "center", "center", "center", "center 18%"];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -187,9 +190,9 @@ function TiltPhoto() {
         className="animate-float-y relative h-[360px] w-[300px] overflow-hidden rounded-[2rem] sm:h-[520px] sm:w-[420px]">
         <div className="absolute -inset-1 rounded-[2.2rem] opacity-90 blur-2xl"
           style={{ background: "var(--gradient-nebula)" }} />
-        <img src={p6.url} alt="Flamobita and Snowy Owgy"
+        <img src={coupleHero.url} alt="Flamobita and Snowy Owgy"
           className="relative h-full w-full rounded-[2rem] object-cover"
-          style={{ boxShadow: "var(--shadow-glow-pink)" }} />
+          style={{ objectPosition: "center 30%", boxShadow: "var(--shadow-glow-pink)" }} />
         {Array.from({ length: 12 }).map((_, i) => (
           <span key={i} className="animate-twinkle absolute h-1 w-1 rounded-full bg-white"
             style={{
@@ -389,6 +392,52 @@ function StickerKingdomScene() {
   );
 }
 
+/* ---------------- Scene 3b: All Stickers Gallery ---------------- */
+function AllStickersScene() {
+  return (
+    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
+      <div className="absolute inset-0"><Starfield density={140} /></div>
+      <NebulaBlobs />
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-10">
+        <div className="text-center">
+          <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter III · ½</div>
+          <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">All Stickers</h2>
+          <p className="mt-2 text-sm text-white/60">Every little bear, gathered in one cosmic shelf.</p>
+        </div>
+
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-5">
+          {BEAR_STICKERS.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 30, rotate: i % 2 ? -6 : 6 }}
+              whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: (i % 5) * 0.08 }}
+              whileHover={{ y: -6, scale: 1.05, rotate: i % 2 ? 3 : -3 }}
+              className="group glass-card relative flex aspect-square items-center justify-center rounded-3xl p-3"
+              style={{ boxShadow: "var(--shadow-glow-pink)" }}
+            >
+              <div className="absolute inset-3 rounded-2xl opacity-40 blur-2xl"
+                style={{ background: "var(--gradient-nebula)" }} />
+              <motion.img
+                src={s.img}
+                alt={s.caption}
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+                className="relative h-full w-full object-contain drop-shadow-[0_8px_24px_rgba(255,180,230,0.55)]"
+              />
+              <div className="absolute inset-x-2 bottom-2 truncate rounded-full bg-black/40 px-2 py-1 text-center text-[11px] text-white/85 backdrop-blur-md">
+                {s.caption}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 /* ---------------- Scene 4: Memory Vault ---------------- */
 const MEMORY_META = [
   { title: "Our Moment", note: "A frame I never want to forget." },
@@ -397,9 +446,9 @@ const MEMORY_META = [
   { title: "Together", note: "Two hearts, one orbit." },
   { title: "Forever Pose", note: "Bottled this minute for life." },
   { title: "Golden Hour", note: "The day glowed because of you." },
-  { title: "Snap of Us", note: "Captured in a heartbeat." },
+  { title: "Pookie version only for you", note: "Captured in a heartbeat." },
 ];
-const MEMORIES = PHOTOS.map((p, i) => ({ ...MEMORY_META[i], img: p.url }));
+const MEMORIES = PHOTOS.map((p, i) => ({ ...MEMORY_META[i], img: p.url, pos: PHOTO_POS[i] }));
 
 function MemoryVaultScene() {
   const [open, setOpen] = useState<number | null>(null);
@@ -424,7 +473,7 @@ function MemoryVaultScene() {
               className="group glass-card relative h-56 overflow-hidden rounded-3xl text-left sm:h-64"
               style={{ transformStyle: "preserve-3d" }}>
               <div className="absolute inset-0 transition duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${m.img})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+                style={{ backgroundImage: `url(${m.img})`, backgroundSize: "cover", backgroundPosition: m.pos }} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
               <div className="relative z-10 flex h-full flex-col justify-end p-4">
                 <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">Memory {String(i + 1).padStart(2, "0")}</div>
@@ -449,7 +498,7 @@ function MemoryVaultScene() {
               <div className="mt-2 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{MEMORIES[open].title}</div>
               <div className="mt-2 text-white/75">{MEMORIES[open].note}</div>
               <div className="mt-6 h-72 overflow-hidden rounded-2xl" style={{ boxShadow: "var(--shadow-glow-violet)" }}>
-                <img src={MEMORIES[open].img} alt={MEMORIES[open].title} className="h-full w-full object-cover" />
+                <img src={MEMORIES[open].img} alt={MEMORIES[open].title} className="h-full w-full object-cover" style={{ objectPosition: MEMORIES[open].pos }} />
               </div>
             </motion.div>
           </motion.div>
@@ -835,6 +884,7 @@ const SCENES: SceneDef[] = [
   { id: "universe",   title: "Our Universe",         render: () => <UniverseScene /> },
   { id: "chat",       title: "Chat Galaxy",          render: () => <ChatGalaxyScene /> },
   { id: "stickers",   title: "Sticker Kingdom",      render: () => <StickerKingdomScene /> },
+  { id: "all-stickers", title: "All Stickers",       render: () => <AllStickersScene /> },
   { id: "memories",   title: "Memory Vault",         render: () => <MemoryVaultScene /> },
   { id: "tour",       title: "World Tour",           render: () => <WorldTourScene /> },
   { id: "stars",      title: "Birthday Constellations", render: () => <BirthdayConstellationsScene /> },
