@@ -192,8 +192,7 @@ function TiltPhoto() {
           style={{ background: "var(--gradient-nebula)" }} />
         <img src={coupleHero.url} alt="Flamobita and Snowy Owgy"
           className="relative h-full w-full rounded-[2rem] object-cover"
-          style={{ objectPosition: "center 30%" }}
-          style={{ boxShadow: "var(--shadow-glow-pink)" }} />
+          style={{ objectPosition: "center 30%", boxShadow: "var(--shadow-glow-pink)" }} />
         {Array.from({ length: 12 }).map((_, i) => (
           <span key={i} className="animate-twinkle absolute h-1 w-1 rounded-full bg-white"
             style={{
