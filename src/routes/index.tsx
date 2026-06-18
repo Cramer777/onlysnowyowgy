@@ -307,11 +307,19 @@ function ChatGalaxyScene() {
 }
 
 /* ---------------- Scene 3: Sticker Kingdom (bears) ---------------- */
-const BEAR_STICKERS = [
-  { img: bearLick.url, caption: "Yumm 🤤", mood: "Tasty thoughts" },
-  { img: bearAxe.url, caption: "Don't test me 🪓", mood: "Tiny warrior" },
-  { img: bearGrin.url, caption: "Cheeeese 😬", mood: "Big silly grin" },
+const STICKER_CAPTIONS = [
+  "Soft hellos 💗",
+  "Boop 🌸",
+  "Heartbeat 💓",
+  "Eyy you 😏",
+  "Giggle attack 🤭",
+  "Achaaa 🙄",
+  "Aww moment 🥺",
+  "Tasty thoughts 🤤",
+  "Tiny warrior 🪓",
+  "Big silly grin 😬",
 ];
+const BEAR_STICKERS = STICKERS.map((s, i) => ({ img: s.url, caption: STICKER_CAPTIONS[i], mood: "From Snowy's sticker pack" }));
 
 function StickerKingdomScene() {
   const [active, setActive] = useState<number | null>(null);
