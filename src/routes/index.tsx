@@ -22,9 +22,12 @@ import p4 from "@/assets/photos/1780219237742.jpg.asset.json";
 import p5 from "@/assets/photos/1781427501184.jpg.asset.json";
 import p6 from "@/assets/photos/IMG_20260112_065136.jpg.asset.json";
 import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
+import coupleHero from "@/assets/photos/couple-hero.jpg.asset.json";
 
 const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
 const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
+// Per-photo focal point to keep faces in frame
+const PHOTO_POS = ["center", "center", "center", "center", "center", "center", "center 18%"];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -187,8 +190,9 @@ function TiltPhoto() {
         className="animate-float-y relative h-[360px] w-[300px] overflow-hidden rounded-[2rem] sm:h-[520px] sm:w-[420px]">
         <div className="absolute -inset-1 rounded-[2.2rem] opacity-90 blur-2xl"
           style={{ background: "var(--gradient-nebula)" }} />
-        <img src={p6.url} alt="Flamobita and Snowy Owgy"
+        <img src={coupleHero.url} alt="Flamobita and Snowy Owgy"
           className="relative h-full w-full rounded-[2rem] object-cover"
+          style={{ objectPosition: "center 30%" }}
           style={{ boxShadow: "var(--shadow-glow-pink)" }} />
         {Array.from({ length: 12 }).map((_, i) => (
           <span key={i} className="animate-twinkle absolute h-1 w-1 rounded-full bg-white"
@@ -397,9 +401,9 @@ const MEMORY_META = [
   { title: "Together", note: "Two hearts, one orbit." },
   { title: "Forever Pose", note: "Bottled this minute for life." },
   { title: "Golden Hour", note: "The day glowed because of you." },
-  { title: "Snap of Us", note: "Captured in a heartbeat." },
+  { title: "Pookie version only for you", note: "Captured in a heartbeat." },
 ];
-const MEMORIES = PHOTOS.map((p, i) => ({ ...MEMORY_META[i], img: p.url }));
+const MEMORIES = PHOTOS.map((p, i) => ({ ...MEMORY_META[i], img: p.url, pos: PHOTO_POS[i] }));
 
 function MemoryVaultScene() {
   const [open, setOpen] = useState<number | null>(null);
@@ -424,7 +428,7 @@ function MemoryVaultScene() {
               className="group glass-card relative h-56 overflow-hidden rounded-3xl text-left sm:h-64"
               style={{ transformStyle: "preserve-3d" }}>
               <div className="absolute inset-0 transition duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url(${m.img})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+                style={{ backgroundImage: `url(${m.img})`, backgroundSize: "cover", backgroundPosition: m.pos }} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
               <div className="relative z-10 flex h-full flex-col justify-end p-4">
                 <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">Memory {String(i + 1).padStart(2, "0")}</div>
@@ -449,7 +453,7 @@ function MemoryVaultScene() {
               <div className="mt-2 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{MEMORIES[open].title}</div>
               <div className="mt-2 text-white/75">{MEMORIES[open].note}</div>
               <div className="mt-6 h-72 overflow-hidden rounded-2xl" style={{ boxShadow: "var(--shadow-glow-violet)" }}>
-                <img src={MEMORIES[open].img} alt={MEMORIES[open].title} className="h-full w-full object-cover" />
+                <img src={MEMORIES[open].img} alt={MEMORIES[open].title} className="h-full w-full object-cover" style={{ objectPosition: MEMORIES[open].pos }} />
               </div>
             </motion.div>
           </motion.div>
