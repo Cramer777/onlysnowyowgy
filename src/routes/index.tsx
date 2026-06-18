@@ -536,70 +536,153 @@ const PARTICLE_FOR: Record<string, string> = {
 };
 
 function WorldTourScene() {
-  const [active, setActive] = useState<string | null>(null);
-  const current = PLACES.find(p => p.name === active);
+  const [unlocked, setUnlocked] = useState(1); // how many places revealed
+  const [openIdx, setOpenIdx] = useState<number | null>(0); // currently viewing
+  const [refusedAt, setRefusedAt] = useState<number | null>(null);
+  const [confirmed, setConfirmed] = useState<boolean[]>(() => PLACES.map(() => false));
+
+  const place = openIdx !== null ? PLACES[openIdx] : null;
+
+  const sayYes = (i: number) => {
+    setConfirmed(c => c.map((v, idx) => (idx === i ? true : v)));
+    setUnlocked(u => Math.max(u, i + 2));
+    setOpenIdx(null);
+  };
+  const sayNo = (i: number) => setRefusedAt(i);
+
+  const CUTE_NO_MESSAGES = [
+    "Hawww 🥺 without you the whole tour stops here…",
+    "But the stars already booked our tickets 🥹",
+    "Flamobita is sitting on the suitcase, refusing to move 🧳💔",
+    "Okay then I'll just float in space alone 👨‍🚀💫",
+  ];
+
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
       <NebulaBlobs />
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+      <div className="relative z-10 mx-auto max-w-5xl px-6 py-10 text-center">
         <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter V</div>
         <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">World Tour Together</h2>
-        <p className="mt-2 text-sm text-white/60">Tap a dream destination — each opens its own tiny world.</p>
+        <p className="mt-2 text-sm text-white/60">
+          One destination at a time — say <span className="text-rose">yes</span> and the next world appears.
+        </p>
 
-        <div className="relative mt-6 flex-1 w-full max-w-[560px] aspect-square">
-          <div className="absolute inset-0 rounded-full opacity-70 blur-3xl"
-            style={{ background: "radial-gradient(circle, oklch(0.55 0.25 340 / 0.7), transparent 70%)" }} />
-          <div className="relative h-full w-full">
-            <div className="animate-spin-slow absolute inset-[10%] rounded-full border border-white/10"
-              style={{
-                background: "radial-gradient(circle at 30% 30%, oklch(0.45 0.18 280), oklch(0.18 0.10 270) 70%)",
-                boxShadow: "inset -40px -40px 100px oklch(0 0 0 / 0.6), 0 0 80px oklch(0.55 0.25 320 / 0.5)",
-              }}>
-              {[20, 40, 60, 80].map(t => (
-                <div key={t} className="absolute left-1/2 -translate-x-1/2 rounded-[50%] border border-white/10"
-                  style={{ top: `${t}%`, width: "96%", height: "8%" }} />
-              ))}
-            </div>
-            {PLACES.map((p, i) => {
-              const angle = (i / PLACES.length) * Math.PI * 2;
-              const x = Math.cos(angle) * 44;
-              const y = Math.sin(angle) * 44;
-              return (
-                <button key={p.name} onClick={() => setActive(p.name)}
-                  className="group absolute left-1/2 top-1/2"
-                  style={{ transform: `translate(calc(-50% + ${x}%), calc(-50% + ${y}%))` }}>
-                  <div className="relative">
-                    <span className="absolute -inset-2 animate-ping rounded-full bg-rose/40" />
-                    <span className="relative grid h-10 w-10 place-items-center rounded-full glass-card text-base transition group-hover:scale-125"
-                      style={{ boxShadow: `0 0 20px ${p.color}` }}>{p.flag}</span>
-                    <span className="mt-1 block whitespace-nowrap text-[10px] text-white/80">{p.name}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+          {PLACES.map((p, i) => {
+            const revealed = i < unlocked;
+            const done = confirmed[i];
+            return (
+              <div key={p.name} className="flex items-center gap-2 sm:gap-3">
+                <AnimatePresence mode="popLayout">
+                  {revealed ? (
+                    <motion.button
+                      key="r"
+                      initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ type: "spring", damping: 14 }}
+                      whileHover={{ scale: 1.08, y: -4 }}
+                      onClick={() => setOpenIdx(i)}
+                      className="glass-card relative flex flex-col items-center gap-1 rounded-2xl px-4 py-3"
+                      style={{ boxShadow: done ? `0 0 28px ${p.color}` : `0 0 14px ${p.color}55` }}
+                    >
+                      <span className="text-2xl">{p.flag}</span>
+                      <span className="text-[11px] uppercase tracking-[0.2em] text-white/80">{p.name}</span>
+                      {done && <span className="absolute -right-1 -top-1 text-sm">💖</span>}
+                    </motion.button>
+                  ) : (
+                    <motion.div
+                      key="l"
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="glass-card grid h-[68px] w-[88px] place-items-center rounded-2xl text-lg text-white/40">
+                      ✦
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                {i < PLACES.length - 1 && (
+                  <span className={`h-px w-4 sm:w-6 ${i + 1 < unlocked ? "bg-rose/60" : "bg-white/15"}`} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 text-xs uppercase tracking-[0.3em] text-white/50">
+          {unlocked - 1} of {PLACES.length} dreams unlocked
         </div>
       </div>
 
+      {/* Place dialog */}
       <AnimatePresence>
-        {active && current && (
+        {place && openIdx !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setActive(null)}
-            className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6">
-            <motion.div initial={{ scale: 0.8, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85 }}
+            className="fixed inset-0 z-50 grid place-items-center bg-black/75 backdrop-blur-xl p-4"
+            onClick={() => setOpenIdx(null)}>
+            <motion.div initial={{ scale: 0.85, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9 }}
               transition={{ type: "spring", damping: 20 }} onClick={(e) => e.stopPropagation()}
+              className="glass-card w-full max-w-md rounded-3xl p-7 text-center"
+              style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+              <div className="text-xs uppercase tracking-[0.4em] text-white/60">{place.flag} {place.landmark}</div>
+              <div className="mt-1 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{place.name}</div>
+              <div className="my-6">
+                <PlaceDiorama img={place.img} color={place.color}
+                  particles={PARTICLE_FOR[place.name] ?? "✨"} />
+              </div>
+              <p className="text-white/85 italic" style={{ fontFamily: "var(--font-display)" }}>
+                "Are we going to {place.name} together?"
+              </p>
+              {confirmed[openIdx] ? (
+                <div className="mt-5 text-sm text-rose">💖 Already promised — see you in {place.name}.</div>
+              ) : (
+                <div className="mt-6 flex justify-center gap-3">
+                  <button onClick={() => sayYes(openIdx)}
+                    className="rounded-full px-6 py-2.5 text-sm font-medium tracking-wide text-white transition hover:scale-105"
+                    style={{ background: "var(--gradient-nebula)", boxShadow: "var(--shadow-glow-pink)" }}>
+                    Yes, with you 💞
+                  </button>
+                  <button onClick={() => sayNo(openIdx)}
+                    className="glass-card rounded-full px-5 py-2.5 text-sm text-white/80 transition hover:scale-105">
+                    No
+                  </button>
+                </div>
+              )}
+              <button onClick={() => setOpenIdx(null)}
+                className="mt-6 text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-white/80">
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Refused — cute block */}
+      <AnimatePresence>
+        {refusedAt !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] grid place-items-center bg-black/85 backdrop-blur-xl p-6">
+            <motion.div initial={{ scale: 0.7, y: 40, rotate: -4 }} animate={{ scale: 1, y: 0, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", damping: 16 }}
               className="glass-card max-w-md rounded-3xl p-8 text-center"
               style={{ boxShadow: "var(--shadow-glow-pink)" }}>
-              <div className="text-xs uppercase tracking-[0.4em] text-white/60">{current.flag} {current.landmark}</div>
-              <div className="mt-1 text-3xl text-white" style={{ fontFamily: "var(--font-display)" }}>{current.name}</div>
-              <div className="my-6">
-                <PlaceDiorama img={current.img} color={current.color}
-                  particles={PARTICLE_FOR[current.name] ?? "✨"} />
+              <div className="text-6xl">🥺</div>
+              <div className="mt-3 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>
+                {CUTE_NO_MESSAGES[refusedAt % CUTE_NO_MESSAGES.length]}
               </div>
-              <p className="text-white/80 italic">"One day, Flamobita and Snowy Owgy will be here together."</p>
-              <button onClick={() => setActive(null)}
-                className="mt-6 rounded-full px-5 py-2 text-xs uppercase tracking-[0.3em] text-white"
-                style={{ background: "var(--gradient-nebula)" }}>Close</button>
+              <p className="mt-4 text-sm text-white/70 italic">
+                The universe stays paused right here until you say yes…<br />
+                no Snowy, no tour, no next chapter. 💔
+              </p>
+              <div className="mt-6 flex flex-col items-center gap-2">
+                <button onClick={() => { sayYes(refusedAt); setRefusedAt(null); }}
+                  className="rounded-full px-7 py-3 text-sm font-medium text-white transition hover:scale-105"
+                  style={{ background: "var(--gradient-nebula)", boxShadow: "var(--shadow-glow-pink)" }}>
+                  Okayyy fine, yes 💖
+                </button>
+                <button onClick={() => setRefusedAt(null)}
+                  className="text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-white/70">
+                  Think again
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -607,6 +690,7 @@ function WorldTourScene() {
     </div>
   );
 }
+
 
 /* ---------------- Scene 6: Birthday Constellations ---------------- */
 function Constellation({ title, date, points }: { title: string; date: string; points: [number, number][] }) {
