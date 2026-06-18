@@ -2,16 +2,29 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 
-import couplePhoto from "@/assets/uploads/IMG_20260616_145518.jpg.asset.json";
-import girlGingham from "@/assets/uploads/IMG_20260616_145719.jpg.asset.json";
-import girlHeart from "@/assets/uploads/IMG_20260616_145738.jpg.asset.json";
-import girlKnife from "@/assets/uploads/IMG_20260616_145808.jpg.asset.json";
-import girlGiggle from "@/assets/uploads/IMG_20260616_145824.jpg.asset.json";
-import girlAcha from "@/assets/uploads/IMG_20260616_145854.jpg.asset.json";
-import girlAww from "@/assets/uploads/IMG_20260616_145923.jpg.asset.json";
-import bearLick from "@/assets/uploads/IMG_20260616_150135.jpg.asset.json";
-import bearAxe from "@/assets/uploads/IMG_20260616_150308.jpg.asset.json";
-import bearGrin from "@/assets/uploads/IMG_20260616_150417.jpg.asset.json";
+// Stickers (10) — IMG_20260616_*
+import s1 from "@/assets/uploads/IMG_20260616_145518.jpg.asset.json";
+import s2 from "@/assets/uploads/IMG_20260616_145719.jpg.asset.json";
+import s3 from "@/assets/uploads/IMG_20260616_145738.jpg.asset.json";
+import s4 from "@/assets/uploads/IMG_20260616_145808.jpg.asset.json";
+import s5 from "@/assets/uploads/IMG_20260616_145824.jpg.asset.json";
+import s6 from "@/assets/uploads/IMG_20260616_145854.jpg.asset.json";
+import s7 from "@/assets/uploads/IMG_20260616_145923.jpg.asset.json";
+import s8 from "@/assets/uploads/IMG_20260616_150135.jpg.asset.json";
+import s9 from "@/assets/uploads/IMG_20260616_150308.jpg.asset.json";
+import s10 from "@/assets/uploads/IMG_20260616_150417.jpg.asset.json";
+
+// Photos (7) — real memories
+import p1 from "@/assets/photos/1770644205624.jpg.asset.json";
+import p2 from "@/assets/photos/1780219210123.jpg.asset.json";
+import p3 from "@/assets/photos/1780219210141.jpg.asset.json";
+import p4 from "@/assets/photos/1780219237742.jpg.asset.json";
+import p5 from "@/assets/photos/1781427501184.jpg.asset.json";
+import p6 from "@/assets/photos/IMG_20260112_065136.jpg.asset.json";
+import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
+
+const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
+const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
 
 export const Route = createFileRoute("/")({
   head: () => ({
