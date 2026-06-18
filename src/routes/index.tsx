@@ -400,7 +400,6 @@ const MEMORY_META = [
   { title: "Snap of Us", note: "Captured in a heartbeat." },
 ];
 const MEMORIES = PHOTOS.map((p, i) => ({ ...MEMORY_META[i], img: p.url }));
-];
 
 function MemoryVaultScene() {
   const [open, setOpen] = useState<number | null>(null);
