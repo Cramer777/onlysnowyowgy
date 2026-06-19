@@ -334,12 +334,12 @@ function TiltPhoto() {
     <div className="relative" style={{ perspective: 1200 }}>
       <motion.div ref={ref} onMouseMove={onMove} onMouseLeave={reset}
         style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d" }}
-        className="animate-float-y relative h-[360px] w-[300px] overflow-hidden rounded-[2rem] sm:h-[520px] sm:w-[420px]">
+        className="animate-float-y relative h-[320px] w-[440px] overflow-hidden rounded-[2rem] sm:h-[400px] sm:w-[560px]">
         <div className="absolute -inset-1 rounded-[2.2rem] opacity-90 blur-2xl"
           style={{ background: "var(--gradient-nebula)" }} />
         <img src={coupleHero.url} alt="Flamobita and Snowy Owgy"
           className="relative h-full w-full rounded-[2rem] object-cover"
-          style={{ objectPosition: "center 30%", boxShadow: "var(--shadow-glow-pink)" }} />
+          style={{ objectPosition: "center center", boxShadow: "var(--shadow-glow-pink)" }} />
         {Array.from({ length: 12 }).map((_, i) => (
           <span key={i} className="animate-twinkle absolute h-1 w-1 rounded-full bg-white"
             style={{
