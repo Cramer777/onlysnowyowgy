@@ -649,6 +649,7 @@ function MemoryVaultScene() {
 
 /* ---------------- Scene 5: World Tour (real photos in 3D) ---------------- */
 const PLACES = [
+  { name: "Edinburgh",   flag: "🏴", landmark: "Edinburgh Castle",      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Edinburgh_Castle_from_the_North.JPG/1280px-Edinburgh_Castle_from_the_North.JPG", color: "oklch(0.70 0.15 160)" },
   { name: "Paris",       flag: "🇫🇷", landmark: "Eiffel Tower",         img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900&q=80", color: "oklch(0.78 0.18 30)" },
   { name: "Switzerland", flag: "🇨🇭", landmark: "The Matterhorn",       img: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900&q=80", color: "oklch(0.85 0.10 220)" },
   { name: "Italy",       flag: "🇮🇹", landmark: "Roman Colosseum",      img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=900&q=80", color: "oklch(0.75 0.18 80)" },
@@ -657,7 +658,6 @@ const PLACES = [
   { name: "Japan",       flag: "🇯🇵", landmark: "Fushimi Inari Shrine", img: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=900&q=80", color: "oklch(0.75 0.22 20)" },
   { name: "China",       flag: "🇨🇳", landmark: "The Great Wall",       img: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=900&q=80", color: "oklch(0.78 0.20 40)" },
   { name: "Disney World",flag: "🏰", landmark: "Magic Kingdom",         img: "https://images.unsplash.com/photo-1597466599360-3b9775841aec?w=900&q=80", color: "oklch(0.80 0.22 320)" },
-  { name: "Edinburgh",   flag: "🏴", landmark: "Edinburgh Castle",      img: "https://images.unsplash.com/photo-1566041510639-8d95a2490bfb?w=900&q=80", color: "oklch(0.70 0.15 160)" },
   { name: "India",       flag: "🇮🇳", landmark: "Taj Mahal",            img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=900&q=80", color: "oklch(0.80 0.20 90)" },
 ];
 
