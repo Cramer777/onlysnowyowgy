@@ -532,34 +532,6 @@ function StickerKingdomScene() {
     </div>
   );
 }
-/* OLD-CAPTION-BLOCK-REMOVED */
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {active !== null && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setActive(null)}
-            className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6">
-            <motion.div initial={{ scale: 0.8, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85 }}
-              transition={{ type: "spring", damping: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="glass-card relative w-full max-w-sm rounded-3xl p-8 text-center"
-              style={{ boxShadow: "var(--shadow-glow-pink)" }}>
-              <img src={BEAR_STICKERS[active].img} alt="" className="mx-auto h-60 w-60 object-contain" />
-              <div className="mt-4 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>
-                {BEAR_STICKERS[active].caption}
-              </div>
-              <div className="mt-1 text-sm text-white/65">{BEAR_STICKERS[active].mood}</div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
 
 /* ---------------- Scene 3b: All Stickers Gallery ---------------- */
 function AllStickersScene() {
