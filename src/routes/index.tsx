@@ -733,8 +733,11 @@ function WorldTourScene() {
 
   const sayYes = (i: number) => {
     setConfirmed(c => c.map((v, idx) => (idx === i ? true : v)));
-    setUnlocked(u => Math.max(u, i + 2));
-    setOpenIdx(null);
+    const next = i + 1;
+    setUnlocked(u => Math.max(u, next + 1));
+    // Auto-advance to next place if it exists
+    if (next < PLACES.length) setOpenIdx(next);
+    else setOpenIdx(null);
   };
   const sayNo = (i: number) => setRefusedAt(i);
 
