@@ -623,6 +623,7 @@ function MemoryVaultScene() {
           ))}
         </div>
       </div>
+      <HiddenItem id="moon" emoji="🌙" className="right-5 top-20" size="text-xl" />
 
       <AnimatePresence>
         {open !== null && (
