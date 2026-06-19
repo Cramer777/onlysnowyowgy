@@ -433,6 +433,7 @@ function ChatGalaxyScene() {
               </div>
             );
           })}
+          <HiddenItem id="star" emoji="⭐" className="left-3 top-3" size="text-xl" />
         </div>
       </div>
 
