@@ -469,7 +469,7 @@ const STICKER_CAPTIONS = [
   "Tiny warrior 🪓",
   "Big silly grin 😬",
 ];
-const BEAR_STICKERS = STICKERS.map((s, i) => ({ img: s.url, caption: STICKER_CAPTIONS[i], mood: "From Snowy's sticker pack" }));
+const BEAR_STICKERS = STICKERS.map((s, i) => ({ img: s.url, caption: STICKER_CAPTIONS[i] ?? "", mood: "From Snowy's sticker pack" }));
 
 function StickerKingdomScene() {
   const [active, setActive] = useState<number | null>(null);
