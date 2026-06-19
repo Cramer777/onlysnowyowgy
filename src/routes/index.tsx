@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState, useCallback, createContext, useContext } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 
-// Stickers (10) — IMG_20260616_*
+// Stickers (10) — original
 import s1 from "@/assets/uploads/IMG_20260616_145518.jpg.asset.json";
 import s2 from "@/assets/uploads/IMG_20260616_145719.jpg.asset.json";
 import s3 from "@/assets/uploads/IMG_20260616_145738.jpg.asset.json";
@@ -13,6 +13,16 @@ import s7 from "@/assets/uploads/IMG_20260616_145923.jpg.asset.json";
 import s8 from "@/assets/uploads/IMG_20260616_150135.jpg.asset.json";
 import s9 from "@/assets/uploads/IMG_20260616_150308.jpg.asset.json";
 import s10 from "@/assets/uploads/IMG_20260616_150417.jpg.asset.json";
+// Stickers (9 more) — newly uploaded
+import s11 from "@/assets/uploads2/IMG_20260616_150157.jpg.asset.json";
+import s12 from "@/assets/uploads2/IMG_20260616_150238.jpg.asset.json";
+import s13 from "@/assets/uploads2/IMG_20260616_150334.jpg.asset.json";
+import s14 from "@/assets/uploads2/IMG_20260616_150355.jpg.asset.json";
+import s15 from "@/assets/uploads2/IMG_20260616_150436.jpg.asset.json";
+import s16 from "@/assets/uploads2/IMG_20260616_150711.jpg.asset.json";
+import s17 from "@/assets/uploads2/IMG_20260616_150811.jpg.asset.json";
+import s18 from "@/assets/uploads2/IMG_20260616_150840.jpg.asset.json";
+import s19 from "@/assets/uploads2/IMG_20260616_150907.jpg.asset.json";
 
 // Photos (7) — real memories
 import p1 from "@/assets/photos/1770644205624.jpg.asset.json";
@@ -24,10 +34,147 @@ import p6 from "@/assets/photos/IMG_20260112_065136.jpg.asset.json";
 import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
 import coupleHero from "@/assets/photos/couple-hero.jpg.asset.json";
 
-const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10];
+const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19];
 const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
 // Per-photo focal point to keep faces in frame
 const PHOTO_POS = ["center", "center", "center", "center", "center", "center", "center 18%"];
+
+/* ---------------- Quest System ---------------- */
+type QuestId = "star" | "moon" | "teddy" | "airplane" | "heart";
+const QUEST_IDS: QuestId[] = ["star", "moon", "teddy", "airplane", "heart"];
+const QUEST_KEY = "snowy-quest-v1";
+type QuestState = { started: boolean; found: QuestId[] };
+const QuestCtx = createContext<{
+  state: QuestState;
+  start: () => void;
+  discover: (id: QuestId) => void;
+} | null>(null);
+function useQuest() {
+  const c = useContext(QuestCtx);
+  if (!c) throw new Error("QuestCtx missing");
+  return c;
+}
+function QuestProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<QuestState>({ started: false, found: [] });
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(QUEST_KEY);
+      if (raw) setState(JSON.parse(raw));
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem(QUEST_KEY, JSON.stringify(state)); } catch {}
+  }, [state]);
+  const start = useCallback(() => setState(s => s.started ? s : { ...s, started: true }), []);
+  const discover = useCallback((id: QuestId) => {
+    setState(s => s.found.includes(id) ? s : { started: true, found: [...s.found, id] });
+  }, []);
+  return <QuestCtx.Provider value={{ state, start, discover }}>{children}</QuestCtx.Provider>;
+}
+
+function HiddenItem({ id, emoji, className, size = "text-2xl" }: {
+  id: QuestId; emoji: string; className?: string; size?: string;
+}) {
+  const { state, discover } = useQuest();
+  const found = state.found.includes(id);
+  return (
+    <motion.button
+      onClick={(e) => { e.stopPropagation(); discover(id); }}
+      className={`pointer-events-auto absolute z-40 ${size} ${className ?? ""}`}
+      initial={{ opacity: 0.35, scale: 0.9 }}
+      animate={found
+        ? { opacity: 1, scale: [1, 1.8, 1.2], rotate: [0, 360] }
+        : { opacity: [0.35, 0.85, 0.35], scale: [0.9, 1.05, 0.9] }}
+      transition={found
+        ? { duration: 1.2 }
+        : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      whileHover={{ scale: 1.4, opacity: 1 }}
+      style={{ filter: "drop-shadow(0 0 10px oklch(0.85 0.22 340))" }}
+      aria-label={`Hidden ${id}`}
+    >
+      {found ? "✨" : emoji}
+    </motion.button>
+  );
+}
+
+function QuestHUD() {
+  const { state } = useQuest();
+  const navigate = useNavigate();
+  if (!state.started) return null;
+  const n = state.found.length;
+  const done = n >= 5;
+  return (
+    <div className="pointer-events-auto fixed bottom-5 left-5 z-50">
+      <div className="glass-card rounded-2xl px-4 py-3 text-left"
+        style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+        <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">Lost Star of Our Universe</div>
+        <div className="mt-1 flex items-center gap-2 text-sm text-white/90">
+          <span>{n}/5 Found</span>
+          <span className="flex gap-1">
+            {QUEST_IDS.map(id => (
+              <span key={id} className={`h-1.5 w-5 rounded-full ${state.found.includes(id) ? "" : "opacity-25"}`}
+                style={{ background: state.found.includes(id) ? "var(--gradient-nebula)" : "rgba(255,255,255,0.4)" }} />
+            ))}
+          </span>
+        </div>
+        {done && (
+          <button onClick={() => navigate({ to: "/secret" })}
+            className="mt-3 w-full animate-pulse-glow rounded-full px-4 py-2 text-xs font-medium uppercase tracking-[0.3em] text-white"
+            style={{ background: "var(--gradient-nebula)" }}>
+            ✨ Open Secret Portal
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LostStarHint() {
+  const { state, start } = useQuest();
+  const [pos] = useState(() => ({
+    top: 10 + Math.random() * 75,
+    left: 5 + Math.random() * 90,
+  }));
+  const [msg, setMsg] = useState(false);
+  if (state.started) return null;
+  return (
+    <>
+      <motion.button
+        onClick={() => { start(); setMsg(true); }}
+        className="pointer-events-auto fixed z-40 text-base"
+        style={{ top: `${pos.top}%`, left: `${pos.left}%`,
+          filter: "drop-shadow(0 0 12px oklch(0.85 0.22 340)) drop-shadow(0 0 24px white)" }}
+        animate={{ opacity: [0.4, 1, 0.4], scale: [0.8, 1.2, 0.8] }}
+        transition={{ duration: 2.5, repeat: Infinity }}
+        aria-label="A tiny glowing star"
+      >⭐</motion.button>
+      <AnimatePresence>
+        {msg && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setMsg(false)}
+            className="fixed inset-0 z-[70] grid place-items-center bg-black/80 backdrop-blur-xl p-6">
+            <motion.div initial={{ scale: 0.7, y: 30 }} animate={{ scale: 1, y: 0 }}
+              transition={{ type: "spring", damping: 18 }}
+              className="glass-card max-w-md rounded-3xl p-8 text-center"
+              style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+              <div className="text-5xl">⭐</div>
+              <p className="mt-5 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>
+                "Snowy Owgy, a forgotten star is waiting for you…"
+              </p>
+              <p className="mt-4 text-sm text-white/70">
+                Find 5 tiny hidden things across our universe.<br />
+                ⭐ Chat Galaxy · 🌙 Memory Vault · 🧸 Sticker Kingdom · ✈️ World Tour · 💖 Birthday Constellations
+              </p>
+              <button onClick={() => setMsg(false)}
+                className="mt-6 rounded-full px-6 py-2 text-xs uppercase tracking-[0.3em] text-white"
+                style={{ background: "var(--gradient-nebula)" }}>Begin the hunt</button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
