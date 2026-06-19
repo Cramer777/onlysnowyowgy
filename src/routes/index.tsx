@@ -574,13 +574,6 @@ function AllStickersScene() {
     </div>
   );
 }
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 /* ---------------- Scene 4: Memory Vault ---------------- */
