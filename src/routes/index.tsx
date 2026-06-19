@@ -942,6 +942,7 @@ function BirthdayConstellationsScene() {
           <Constellation title="Snowy Owgy" date="August 1" points={heart(160, 150, 7)} />
         </div>
       </div>
+      <HiddenItem id="heart" emoji="💖" className="right-8 bottom-8" size="text-xl" />
     </div>
   );
 }
