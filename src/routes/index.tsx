@@ -507,10 +507,32 @@ function StickerKingdomScene() {
                   <img src={s.img} alt={s.caption}
                     className="relative h-44 w-44 object-contain drop-shadow-[0_8px_24px_rgba(255,180,230,0.55)]" />
                 </motion.div>
-                <div className="mt-3 text-sm text-white/85" style={{ fontFamily: "var(--font-hand)", fontSize: "1.25rem" }}>
-                  {s.caption}
-                </div>
               </motion.button>
+            ))}
+          </div>
+          <HiddenItem id="teddy" emoji="🧸" className="bottom-2 right-4" size="text-3xl" />
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {active !== null && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setActive(null)}
+            className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-xl p-6">
+            <motion.div initial={{ scale: 0.8, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85 }}
+              transition={{ type: "spring", damping: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-card relative w-full max-w-sm rounded-3xl p-8 text-center"
+              style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+              <img src={BEAR_STICKERS[active].img} alt="" className="mx-auto h-60 w-60 object-contain" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+/* OLD-CAPTION-BLOCK-REMOVED */
             ))}
           </div>
         </div>
