@@ -567,9 +567,13 @@ function AllStickersScene() {
                 transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
                 className="relative h-full w-full object-contain drop-shadow-[0_8px_24px_rgba(255,180,230,0.55)]"
               />
-              <div className="absolute inset-x-2 bottom-2 truncate rounded-full bg-black/40 px-2 py-1 text-center text-[11px] text-white/85 backdrop-blur-md">
-                {s.caption}
-              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
             </motion.div>
           ))}
         </div>
