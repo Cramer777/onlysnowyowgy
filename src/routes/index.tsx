@@ -802,8 +802,8 @@ function WorldTourScene() {
           {unlocked - 1} of {PLACES.length} dreams unlocked
         </div>
       </div>
+      <HiddenItem id="airplane" emoji="✈️" className="bottom-6 left-6" size="text-xl" />
 
-      {/* Place dialog */}
       <AnimatePresence>
         {place && openIdx !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
