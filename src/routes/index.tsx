@@ -1127,27 +1127,35 @@ function OurUniverse() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
-      <MusicPlayer />
+    <QuestProvider>
+      <div className="relative h-screen w-screen overflow-hidden">
+        <MusicPlayer />
 
-      <AnimatePresence>
-        {entered && (
-          <motion.div
-            initial={{ scale: 0, opacity: 1 }} animate={{ scale: 30, opacity: 0 }}
-            transition={{ duration: 1.6, ease: [0.7, 0, 0.3, 1] }}
-            className="pointer-events-none fixed left-1/2 top-1/2 z-[60] h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ background: "var(--gradient-nebula)", boxShadow: "var(--shadow-glow-pink)" }}
-          />
+        <AnimatePresence>
+          {entered && (
+            <motion.div
+              initial={{ scale: 0, opacity: 1 }} animate={{ scale: 30, opacity: 0 }}
+              transition={{ duration: 1.6, ease: [0.7, 0, 0.3, 1] }}
+              className="pointer-events-none fixed left-1/2 top-1/2 z-[60] h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{ background: "var(--gradient-nebula)", boxShadow: "var(--shadow-glow-pink)" }}
+            />
+          )}
+        </AnimatePresence>
+
+        {!entered && (
+          <div className="fixed inset-0 z-20">
+            <WelcomePortal onEnter={enter} />
+          </div>
         )}
-      </AnimatePresence>
 
-      {!entered && (
-        <div className="fixed inset-0 z-20">
-          <WelcomePortal onEnter={enter} />
-        </div>
-      )}
-
-      {entered && <CinematicShell />}
-    </div>
+        {entered && (
+          <>
+            <CinematicShell />
+            <LostStarHint />
+            <QuestHUD />
+          </>
+        )}
+      </div>
+    </QuestProvider>
   );
 }
