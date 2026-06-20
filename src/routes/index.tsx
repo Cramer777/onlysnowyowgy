@@ -476,14 +476,14 @@ const BEAR_STICKERS = STICKERS.map((s, i) => ({ img: s.url, caption: STICKER_CAP
 function StickerKingdomScene() {
   const [active, setActive] = useState<number | null>(null);
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
       <NebulaBlobs />
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+      <div className="relative z-10 mx-auto flex min-h-full max-w-6xl flex-col items-center px-6 py-10 text-center">
         <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter III</div>
         <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Sticker Kingdom</h2>
         <p className="mt-2 text-sm text-white/60">Your favorite little bears, floating in our sky.</p>
 
-        <div className="relative mt-10 grid w-full max-w-4xl flex-1 place-items-center">
+        <div className="relative mt-10 grid w-full max-w-4xl place-items-center pb-10">
           {/* aurora pad */}
           <div className="absolute inset-0 mx-auto h-72 w-72 rounded-full opacity-60 blur-3xl"
             style={{ background: "radial-gradient(circle, oklch(0.65 0.25 340 / 0.6), transparent 70%)" }} />
