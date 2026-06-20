@@ -1156,7 +1156,8 @@ function BirthdayConstellationsScene() {
         </motion.div>
 
         <div className="h-10" />
-      </div>
+      </motion.div>
+
       <HiddenItem id="heart" emoji="💖" className="right-8 bottom-8" size="text-xl" />
     </div>
   );
