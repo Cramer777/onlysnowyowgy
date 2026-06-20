@@ -117,7 +117,7 @@ export function PookieVoice() {
       <button
         onClick={startListening}
         aria-label="Voice secret"
-        className="fixed bottom-5 right-5 z-[70] grid h-16 w-16 place-items-center rounded-full border border-white/30 backdrop-blur-2xl transition active:scale-95 sm:bottom-7 sm:right-7"
+        className="fixed bottom-24 right-5 z-[70] grid h-16 w-16 place-items-center rounded-full border border-white/30 backdrop-blur-2xl transition active:scale-95 sm:bottom-28 sm:right-7"
         style={{
           background: "linear-gradient(135deg, oklch(0.78 0.22 340 / 0.45), oklch(0.65 0.25 320 / 0.35))",
           boxShadow: phase === "listening"
