@@ -33,6 +33,7 @@ import p5 from "@/assets/photos/1781427501184.jpg.asset.json";
 import p6 from "@/assets/photos/IMG_20260112_065136.jpg.asset.json";
 import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
 import coupleHero from "@/assets/photos/couple-hero.jpg.asset.json";
+import edinburghImg from "@/assets/photos/edinburgh-castle.jpg.asset.json";
 
 const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19];
 const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
@@ -475,14 +476,14 @@ const BEAR_STICKERS = STICKERS.map((s, i) => ({ img: s.url, caption: STICKER_CAP
 function StickerKingdomScene() {
   const [active, setActive] = useState<number | null>(null);
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
       <NebulaBlobs />
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+      <div className="relative z-10 mx-auto flex min-h-full max-w-6xl flex-col items-center px-6 py-10 text-center">
         <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter III</div>
         <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Sticker Kingdom</h2>
         <p className="mt-2 text-sm text-white/60">Your favorite little bears, floating in our sky.</p>
 
-        <div className="relative mt-10 grid w-full max-w-4xl flex-1 place-items-center">
+        <div className="relative mt-10 grid w-full max-w-4xl place-items-center pb-10">
           {/* aurora pad */}
           <div className="absolute inset-0 mx-auto h-72 w-72 rounded-full opacity-60 blur-3xl"
             style={{ background: "radial-gradient(circle, oklch(0.65 0.25 340 / 0.6), transparent 70%)" }} />
@@ -650,7 +651,7 @@ function MemoryVaultScene() {
 
 /* ---------------- Scene 5: World Tour (real photos in 3D) ---------------- */
 const PLACES = [
-  { name: "Edinburgh",   flag: "🏴", landmark: "Edinburgh Castle",      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Edinburgh_Castle_from_the_North.JPG/1280px-Edinburgh_Castle_from_the_North.JPG", color: "oklch(0.70 0.15 160)" },
+  { name: "Edinburgh",   flag: "🏴", landmark: "Edinburgh Castle",      img: edinburghImg.url, color: "oklch(0.70 0.15 160)" },
   { name: "Paris",       flag: "🇫🇷", landmark: "Eiffel Tower",         img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900&q=80", color: "oklch(0.78 0.18 30)" },
   { name: "Switzerland", flag: "🇨🇭", landmark: "The Matterhorn",       img: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900&q=80", color: "oklch(0.85 0.10 220)" },
   { name: "Italy",       flag: "🇮🇹", landmark: "Roman Colosseum",      img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=900&q=80", color: "oklch(0.75 0.18 80)" },
@@ -921,26 +922,111 @@ function BirthdayConstellationsScene() {
     }
     return pts;
   };
+  // Days together since our anniversary (edit date as needed)
+  const ANNIVERSARY = new Date("2024-08-01T00:00:00");
+  const daysTogether = Math.max(1, Math.floor((Date.now() - ANNIVERSARY.getTime()) / 86400000));
+
+  const FACTS = [
+    { label: "Days orbiting together", value: daysTogether.toLocaleString() },
+    { label: "Galaxies we built", value: "∞" },
+    { label: "Stars I'd name after you", value: "every one" },
+    { label: "Universes I'd pick you in", value: "all of them" },
+  ];
+
+  const WISHES = [
+    "May every sunrise feel like a hug from the sky.",
+    "May your laugh keep colliding with my heart like a happy meteor.",
+    "May the universe always conspire to spoil you a little.",
+    "May we keep collecting tiny forevers — one silly day at a time.",
+    "And may you always know: you are the warmest thing in my cold little galaxy.",
+  ];
+
+  const ZODIAC = [
+    { name: "Flamobita", date: "February 6", sign: "Aquarius ♒", trait: "wild heart, soft soul", color: "oklch(0.78 0.18 320)" },
+    { name: "Snowy Owgy", date: "August 1", sign: "Leo ♌", trait: "sunlight wrapped in giggles", color: "oklch(0.85 0.16 80)" },
+  ];
+
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      <div className="absolute inset-0"><Starfield density={200} /></div>
+    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
+      <div className="pointer-events-none absolute inset-0"><Starfield density={200} /></div>
       {Array.from({ length: 4 }).map((_, i) => (
         <span key={i}
-          className="absolute h-0.5 w-32 rounded-full bg-gradient-to-r from-white to-transparent"
+          className="pointer-events-none absolute h-0.5 w-32 rounded-full bg-gradient-to-r from-white to-transparent"
           style={{
             top: `${10 + i * 18}%`, left: "-10%",
             animation: `shoot ${6 + i}s linear ${i * 2}s infinite`,
             boxShadow: "0 0 20px white",
           }} />
       ))}
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center px-6 pt-10 text-center">
+      <div className="relative z-10 mx-auto flex min-h-full max-w-6xl flex-col items-center px-6 py-10 text-center">
         <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter VI</div>
         <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Birthday Constellations</h2>
         <p className="mt-2 text-sm text-white/60">Two stars, written into the sky.</p>
-        <div className="mt-8 grid w-full flex-1 place-items-center gap-8 sm:grid-cols-2">
+
+        <div className="mt-10 grid w-full place-items-center gap-10 sm:grid-cols-2">
           <Constellation title="Flamobita" date="February 6" points={heart(160, 150, 7)} />
           <Constellation title="Snowy Owgy" date="August 1" points={heart(160, 150, 7)} />
         </div>
+
+        {/* Zodiac cards */}
+        <div className="mt-12 grid w-full gap-5 sm:grid-cols-2">
+          {ZODIAC.map((z) => (
+            <motion.div key={z.name}
+              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              className="glass-card rounded-3xl p-6 text-left"
+              style={{ boxShadow: `0 0 60px ${z.color}55` }}>
+              <div className="text-xs uppercase tracking-[0.4em] text-white/60">{z.date}</div>
+              <div className="mt-1 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>{z.name}</div>
+              <div className="mt-2 text-sm" style={{ color: z.color }}>{z.sign}</div>
+              <p className="mt-3 text-sm italic text-white/75">"{z.trait}"</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Cosmic facts */}
+        <div className="mt-10 grid w-full grid-cols-2 gap-4 sm:grid-cols-4">
+          {FACTS.map((f, i) => (
+            <motion.div key={i}
+              initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="glass-card rounded-2xl px-4 py-5 text-center">
+              <div className="text-gradient-rose text-2xl font-light">{f.value}</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.3em] text-white/60">{f.label}</div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Birthday wishes scroll */}
+        <div className="mt-12 w-full max-w-2xl">
+          <div className="text-xs uppercase tracking-[0.5em] text-white/60">Wishes written in starlight</div>
+          <ul className="mt-5 space-y-3">
+            {WISHES.map((w, i) => (
+              <motion.li key={i}
+                initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                className="glass-card flex items-start gap-3 rounded-2xl px-5 py-4 text-left text-sm text-white/85">
+                <span className="text-lg">✨</span>
+                <span style={{ fontFamily: "var(--font-hand)", fontSize: "1.1rem" }}>{w}</span>
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Birthday cake */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          className="mt-12 glass-card rounded-3xl px-8 py-8 text-center"
+          style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+          <div className="text-6xl">🎂</div>
+          <div className="mt-3 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>
+            Happy Birthday, Snowy Owgy
+          </div>
+          <p className="mt-2 text-sm text-white/70" style={{ fontFamily: "var(--font-hand)", fontSize: "1.15rem" }}>
+            Make a wish — the whole universe is listening.
+          </p>
+        </motion.div>
+
+        <div className="h-10" />
       </div>
       <HiddenItem id="heart" emoji="💖" className="right-8 bottom-8" size="text-xl" />
     </div>
