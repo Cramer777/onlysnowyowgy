@@ -873,9 +873,8 @@ function Constellation({ title, date, points }: { title: string; date: string; p
   );
 }
 
-/* ---- Interactive Heart Constellation Builder ---- */
+/* ---- Interactive Heart Constellation Builder (mobile-optimized) ---- */
 function HeartBuilder({ onComplete }: { onComplete: () => void }) {
-  // Heart-shaped target stars (parametric heart), in order around the curve
   const STARS = useMemo(() => {
     const pts: { x: number; y: number }[] = [];
     const N = 12;
@@ -889,17 +888,49 @@ function HeartBuilder({ onComplete }: { onComplete: () => void }) {
   }, []);
   const [order, setOrder] = useState<number[]>([]);
   const done = order.length === STARS.length;
-
   useEffect(() => { if (done) onComplete(); }, [done, onComplete]);
 
   const tap = (i: number) => {
-    if (done) return;
-    if (order.includes(i)) return;
-    // Must tap next-nearest unvisited star (helps form the heart cleanly, but allow any-order to be forgiving)
+    if (done || order.includes(i)) return;
     setOrder((o) => [...o, i]);
   };
-
   const reset = () => setOrder([]);
+  const undo = () => setOrder((o) => o.slice(0, -1));
+
+  // Pinch / pan
+  const [scale, setScale] = useState(1);
+  const [tx, setTx] = useState(0);
+  const [ty, setTy] = useState(0);
+  const gesture = useRef<{ mode: "none" | "pinch" | "pan"; startDist: number; startScale: number; startX: number; startY: number; startTx: number; startTy: number }>({
+    mode: "none", startDist: 0, startScale: 1, startX: 0, startY: 0, startTx: 0, startTy: 0,
+  });
+  const clampScale = (s: number) => Math.min(3, Math.max(1, s));
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const [a, b] = [e.touches[0], e.touches[1]];
+      const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      gesture.current = { mode: "pinch", startDist: d, startScale: scale, startX: 0, startY: 0, startTx: tx, startTy: ty };
+    } else if (e.touches.length === 1 && scale > 1) {
+      gesture.current = { mode: "pan", startDist: 0, startScale: scale, startX: e.touches[0].clientX, startY: e.touches[0].clientY, startTx: tx, startTy: ty };
+    }
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    const g = gesture.current;
+    if (g.mode === "pinch" && e.touches.length === 2) {
+      e.preventDefault();
+      const [a, b] = [e.touches[0], e.touches[1]];
+      const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      setScale(clampScale(g.startScale * (d / g.startDist)));
+    } else if (g.mode === "pan" && e.touches.length === 1) {
+      e.preventDefault();
+      setTx(g.startTx + (e.touches[0].clientX - g.startX));
+      setTy(g.startTy + (e.touches[0].clientY - g.startY));
+    }
+  };
+  const onTouchEnd = () => { gesture.current.mode = "none"; if (scale <= 1.02) { setScale(1); setTx(0); setTy(0); } };
+
+  const zoom = (delta: number) => setScale((s) => clampScale(s + delta));
+  const recenter = () => { setScale(1); setTx(0); setTy(0); };
 
   const pathD = order.length > 1
     ? order.map((idx, k) => `${k === 0 ? "M" : "L"} ${STARS[idx].x} ${STARS[idx].y}`).join(" ") + (done ? " Z" : "")
@@ -907,49 +938,79 @@ function HeartBuilder({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div className="glass-card relative w-full overflow-hidden rounded-3xl p-4 sm:p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="text-xs uppercase tracking-[0.4em] text-white/60">Build our heart</div>
-        <button onClick={reset} className="text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-white">
-          Reset
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={undo} disabled={!order.length}
+            className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-white/80 transition active:scale-95 disabled:opacity-30">
+            Undo
+          </button>
+          <button onClick={reset} disabled={!order.length}
+            className="rounded-full border border-pink-200/40 bg-pink-300/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.25em] text-pink-100 transition active:scale-95 disabled:opacity-30">
+            Reset
+          </button>
+        </div>
       </div>
-      <p className="mt-1 text-sm text-white/70">Tap each star, one by one, to connect our heart.</p>
-      <div className="relative mt-3 aspect-[4/3] w-full">
-        <svg viewBox="0 0 400 340" className="absolute inset-0 h-full w-full">
-          <defs>
-            <filter id="hbglow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="b" />
-              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-            <linearGradient id="hbline" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stopColor="oklch(0.88 0.18 340)" />
-              <stop offset="100%" stopColor="oklch(0.85 0.16 30)" />
-            </linearGradient>
-          </defs>
-          {pathD && (
-            <motion.path
-              d={pathD} fill={done ? "url(#hbline)" : "none"} fillOpacity={done ? 0.18 : 0}
-              stroke="url(#hbline)" strokeWidth={done ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round"
-              filter="url(#hbglow)"
-              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.4 }}
-            />
-          )}
-          {STARS.map((s, i) => {
-            const picked = order.includes(i);
-            const seq = order.indexOf(i) + 1;
-            return (
-              <g key={i} onClick={() => tap(i)} style={{ cursor: done ? "default" : "pointer" }}>
-                <circle cx={s.x} cy={s.y} r={picked ? 7 : 14} fill="transparent" />
-                <circle cx={s.x} cy={s.y} r={picked ? 4.5 : 3} fill="white" filter="url(#hbglow)">
-                  <animate attributeName="opacity" values="0.5;1;0.5" dur={`${2 + (i % 3)}s`} repeatCount="indefinite" />
-                </circle>
-                {picked && (
-                  <text x={s.x + 8} y={s.y - 8} fill="white" fontSize="9" opacity="0.7">{seq}</text>
-                )}
-              </g>
-            );
-          })}
-        </svg>
+      <p className="mt-1 text-sm text-white/70">Tap each star to connect our heart. Pinch to zoom · drag to pan.</p>
+      <div
+        className="relative mt-3 aspect-[4/3] w-full select-none overflow-hidden rounded-2xl"
+        style={{ touchAction: "none" }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <div className="absolute inset-0" style={{ transform: `translate(${tx}px, ${ty}px) scale(${scale})`, transformOrigin: "center center", transition: gesture.current.mode === "none" ? "transform 0.15s ease-out" : undefined }}>
+          <svg viewBox="0 0 400 340" className="absolute inset-0 h-full w-full">
+            <defs>
+              <filter id="hbglow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="b" />
+                <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+              <linearGradient id="hbline" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stopColor="oklch(0.88 0.18 340)" />
+                <stop offset="100%" stopColor="oklch(0.85 0.16 30)" />
+              </linearGradient>
+            </defs>
+            {pathD && (
+              <motion.path
+                d={pathD} fill={done ? "url(#hbline)" : "none"} fillOpacity={done ? 0.18 : 0}
+                stroke="url(#hbline)" strokeWidth={done ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round"
+                filter="url(#hbglow)"
+                initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.4 }}
+              />
+            )}
+            {STARS.map((s, i) => {
+              const picked = order.includes(i);
+              const next = order.length === i || (!picked && order.length > 0 && !done);
+              const seq = order.indexOf(i) + 1;
+              return (
+                <g key={i} onClick={() => tap(i)} style={{ cursor: done ? "default" : "pointer" }}>
+                  {/* generous invisible touch target (~44px equivalent at base) */}
+                  <circle cx={s.x} cy={s.y} r={26} fill="transparent" />
+                  {!picked && (
+                    <circle cx={s.x} cy={s.y} r={14} fill="oklch(0.85 0.22 340 / 0.15)" stroke="oklch(0.85 0.22 340 / 0.5)" strokeWidth={1} />
+                  )}
+                  <circle cx={s.x} cy={s.y} r={picked ? 5 : 4} fill="white" filter="url(#hbglow)">
+                    <animate attributeName="opacity" values={next ? "0.7;1;0.7" : "0.5;1;0.5"} dur={`${1.4 + (i % 3) * 0.4}s`} repeatCount="indefinite" />
+                  </circle>
+                  {picked && (
+                    <text x={s.x + 9} y={s.y - 9} fill="white" fontSize="10" opacity="0.8">{seq}</text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* zoom controls */}
+        <div className="absolute bottom-2 right-2 flex flex-col gap-1.5">
+          <button onClick={() => zoom(0.4)} aria-label="Zoom in"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition active:scale-95">+</button>
+          <button onClick={() => zoom(-0.4)} aria-label="Zoom out"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition active:scale-95">−</button>
+          <button onClick={recenter} aria-label="Recenter"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-[10px] text-white backdrop-blur transition active:scale-95">⤾</button>
+        </div>
       </div>
       <div className="mt-2 text-center text-[11px] uppercase tracking-[0.3em] text-white/50">
         {done ? "Heart complete ✨" : `${order.length} / ${STARS.length} stars connected`}
