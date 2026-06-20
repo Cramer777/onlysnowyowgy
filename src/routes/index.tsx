@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback, createContext, useContext } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useAnimation } from "framer-motion";
+import { PookieVoice } from "@/components/PookieVoice";
 
 // Stickers (10) — original
 import s1 from "@/assets/uploads/IMG_20260616_145518.jpg.asset.json";
