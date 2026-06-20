@@ -1036,6 +1036,18 @@ function BirthdayConstellationsScene() {
     { name: "Snowy Owgy", date: "August 1", sign: "Leo ♌", trait: "sunlight wrapped in giggles", color: "oklch(0.85 0.16 80)" },
   ];
 
+  const [celebrating, setCelebrating] = useState(false);
+  const shake = useAnimation();
+  const handleComplete = useCallback(() => {
+    if (celebrating) return;
+    setCelebrating(true);
+    shake.start({
+      x: [0, -14, 16, -12, 10, -6, 4, 0],
+      y: [0, 8, -10, 6, -4, 3, -2, 0],
+      transition: { duration: 0.8, ease: "easeInOut" },
+    });
+  }, [celebrating, shake]);
+
   return (
     <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
       <div className="pointer-events-none absolute inset-0"><Starfield density={200} /></div>
@@ -1048,7 +1060,8 @@ function BirthdayConstellationsScene() {
             boxShadow: "0 0 20px white",
           }} />
       ))}
-      <div className="relative z-10 mx-auto flex min-h-full max-w-6xl flex-col items-center px-6 py-10 text-center">
+      {celebrating && <Fireworks />}
+      <motion.div animate={shake} className="relative z-10 mx-auto flex min-h-full max-w-6xl flex-col items-center px-6 py-10 text-center">
         <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter VI</div>
         <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Birthday Constellations</h2>
         <p className="mt-2 text-sm text-white/60">Two stars, written into the sky.</p>
@@ -1057,6 +1070,32 @@ function BirthdayConstellationsScene() {
           <Constellation title="Flamobita" date="February 6" points={heart(160, 150, 7)} />
           <Constellation title="Snowy Owgy" date="August 1" points={heart(160, 150, 7)} />
         </div>
+
+        {/* Interactive Heart Builder */}
+        <div className="mt-12 w-full max-w-2xl">
+          <HeartBuilder onComplete={handleComplete} />
+          <AnimatePresence>
+            {celebrating && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="glass-card mt-6 rounded-3xl px-6 py-7 text-center"
+                style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+                <div className="text-3xl">🎉💖🎆</div>
+                <div className="mt-3 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>
+                  You drew our heart in the stars.
+                </div>
+                <p className="mt-3 text-base text-white/85" style={{ fontFamily: "var(--font-hand)", fontSize: "1.2rem" }}>
+                  Every star you connected is a day I fall a little more.
+                  Happy Birthday, my Snowy Owgy — the universe lit up because you did.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
 
         {/* Zodiac cards */}
         <div className="mt-12 grid w-full gap-5 sm:grid-cols-2">
