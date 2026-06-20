@@ -1114,7 +1114,7 @@ const SCENES: SceneDef[] = [
   { id: "universe",   title: "Our Universe",         render: () => <UniverseScene /> },
   { id: "chat",       title: "Chat Galaxy",          render: () => <ChatGalaxyScene /> },
   { id: "stickers",   title: "Sticker Kingdom",      render: () => <StickerKingdomScene /> },
-  { id: "all-stickers", title: "All Stickers",       render: () => <AllStickersScene /> },
+  
   { id: "memories",   title: "Memory Vault",         render: () => <MemoryVaultScene /> },
   { id: "tour",       title: "World Tour",           render: () => <WorldTourScene /> },
   { id: "stars",      title: "Birthday Constellations", render: () => <BirthdayConstellationsScene /> },
