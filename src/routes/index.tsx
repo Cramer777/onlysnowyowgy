@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback, createContext, useContext } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useAnimation } from "framer-motion";
 
 // Stickers (10) — original
 import s1 from "@/assets/uploads/IMG_20260616_145518.jpg.asset.json";
