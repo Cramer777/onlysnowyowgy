@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback, createContext, useContext } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useAnimation } from "framer-motion";
 
 // Stickers (10) — original
 import s1 from "@/assets/uploads/IMG_20260616_145518.jpg.asset.json";
@@ -535,47 +535,8 @@ function StickerKingdomScene() {
   );
 }
 
-/* ---------------- Scene 3b: All Stickers Gallery ---------------- */
-function AllStickersScene() {
-  return (
-    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
-      <div className="absolute inset-0"><Starfield density={140} /></div>
-      <NebulaBlobs />
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-10">
-        <div className="text-center">
-          <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter III · ½</div>
-          <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">All Stickers</h2>
-          <p className="mt-2 text-sm text-white/60">Every little bear, gathered in one cosmic shelf.</p>
-        </div>
+/* (All Stickers gallery removed — stickers now live solely in Sticker Kingdom) */
 
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-5">
-          {BEAR_STICKERS.map((s, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30, rotate: i % 2 ? -6 : 6 }}
-              whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: (i % 5) * 0.08 }}
-              whileHover={{ y: -6, scale: 1.05, rotate: i % 2 ? 3 : -3 }}
-              className="group glass-card relative flex aspect-square items-center justify-center rounded-3xl p-3"
-              style={{ boxShadow: "var(--shadow-glow-pink)" }}
-            >
-              <div className="absolute inset-3 rounded-2xl opacity-40 blur-2xl"
-                style={{ background: "var(--gradient-nebula)" }} />
-              <motion.img
-                src={s.img}
-                alt={s.caption}
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                className="relative h-full w-full object-contain drop-shadow-[0_8px_24px_rgba(255,180,230,0.55)]"
-              />
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 /* ---------------- Scene 4: Memory Vault ---------------- */
@@ -911,7 +872,136 @@ function Constellation({ title, date, points }: { title: string; date: string; p
   );
 }
 
+/* ---- Interactive Heart Constellation Builder ---- */
+function HeartBuilder({ onComplete }: { onComplete: () => void }) {
+  // Heart-shaped target stars (parametric heart), in order around the curve
+  const STARS = useMemo(() => {
+    const pts: { x: number; y: number }[] = [];
+    const N = 12;
+    for (let i = 0; i < N; i++) {
+      const t = (i / N) * Math.PI * 2 - Math.PI / 2;
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+      pts.push({ x: 200 + x * 9, y: 170 + y * 9 });
+    }
+    return pts;
+  }, []);
+  const [order, setOrder] = useState<number[]>([]);
+  const done = order.length === STARS.length;
+
+  useEffect(() => { if (done) onComplete(); }, [done, onComplete]);
+
+  const tap = (i: number) => {
+    if (done) return;
+    if (order.includes(i)) return;
+    // Must tap next-nearest unvisited star (helps form the heart cleanly, but allow any-order to be forgiving)
+    setOrder((o) => [...o, i]);
+  };
+
+  const reset = () => setOrder([]);
+
+  const pathD = order.length > 1
+    ? order.map((idx, k) => `${k === 0 ? "M" : "L"} ${STARS[idx].x} ${STARS[idx].y}`).join(" ") + (done ? " Z" : "")
+    : "";
+
+  return (
+    <div className="glass-card relative w-full overflow-hidden rounded-3xl p-4 sm:p-6">
+      <div className="flex items-center justify-between">
+        <div className="text-xs uppercase tracking-[0.4em] text-white/60">Build our heart</div>
+        <button onClick={reset} className="text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-white">
+          Reset
+        </button>
+      </div>
+      <p className="mt-1 text-sm text-white/70">Tap each star, one by one, to connect our heart.</p>
+      <div className="relative mt-3 aspect-[4/3] w-full">
+        <svg viewBox="0 0 400 340" className="absolute inset-0 h-full w-full">
+          <defs>
+            <filter id="hbglow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <linearGradient id="hbline" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stopColor="oklch(0.88 0.18 340)" />
+              <stop offset="100%" stopColor="oklch(0.85 0.16 30)" />
+            </linearGradient>
+          </defs>
+          {pathD && (
+            <motion.path
+              d={pathD} fill={done ? "url(#hbline)" : "none"} fillOpacity={done ? 0.18 : 0}
+              stroke="url(#hbline)" strokeWidth={done ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round"
+              filter="url(#hbglow)"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.4 }}
+            />
+          )}
+          {STARS.map((s, i) => {
+            const picked = order.includes(i);
+            const seq = order.indexOf(i) + 1;
+            return (
+              <g key={i} onClick={() => tap(i)} style={{ cursor: done ? "default" : "pointer" }}>
+                <circle cx={s.x} cy={s.y} r={picked ? 7 : 14} fill="transparent" />
+                <circle cx={s.x} cy={s.y} r={picked ? 4.5 : 3} fill="white" filter="url(#hbglow)">
+                  <animate attributeName="opacity" values="0.5;1;0.5" dur={`${2 + (i % 3)}s`} repeatCount="indefinite" />
+                </circle>
+                {picked && (
+                  <text x={s.x + 8} y={s.y - 8} fill="white" fontSize="9" opacity="0.7">{seq}</text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div className="mt-2 text-center text-[11px] uppercase tracking-[0.3em] text-white/50">
+        {done ? "Heart complete ✨" : `${order.length} / ${STARS.length} stars connected`}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Fireworks burst overlay ---- */
+function Fireworks() {
+  const bursts = Array.from({ length: 6 }).map((_, i) => ({
+    x: 10 + (i * 17 + 7) % 80,
+    y: 15 + (i * 23) % 55,
+    delay: i * 0.25,
+    hue: i % 2 ? "oklch(0.85 0.2 340)" : "oklch(0.88 0.18 60)",
+  }));
+  return (
+    <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden">
+      {bursts.map((b, bi) => (
+        <div key={bi} className="absolute" style={{ left: `${b.x}%`, top: `${b.y}%` }}>
+          {Array.from({ length: 18 }).map((_, i) => {
+            const a = (i / 18) * Math.PI * 2;
+            return (
+              <motion.span key={i}
+                className="absolute block h-1.5 w-1.5 rounded-full"
+                style={{ background: b.hue, boxShadow: `0 0 12px ${b.hue}` }}
+                initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                animate={{ x: Math.cos(a) * 120, y: Math.sin(a) * 120, opacity: 0, scale: 0.4 }}
+                transition={{ duration: 1.4, delay: b.delay, ease: "easeOut" }}
+              />
+            );
+          })}
+        </div>
+      ))}
+      {/* falling confetti */}
+      {Array.from({ length: 40 }).map((_, i) => (
+        <motion.span key={`c${i}`}
+          className="absolute block h-2 w-1 rounded-sm"
+          style={{
+            left: `${(i * 53) % 100}%`,
+            background: i % 3 === 0 ? "oklch(0.88 0.18 340)" : i % 3 === 1 ? "oklch(0.9 0.18 60)" : "oklch(0.85 0.16 200)",
+          }}
+          initial={{ y: -20, opacity: 0, rotate: 0 }}
+          animate={{ y: "110vh", opacity: [0, 1, 1, 0], rotate: 360 }}
+          transition={{ duration: 3 + (i % 4), delay: (i % 10) * 0.1, ease: "easeIn" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 function BirthdayConstellationsScene() {
+
   const heart = (cx: number, cy: number, s: number): [number, number][] => {
     const pts: [number, number][] = [];
     for (let i = 0; i < 14; i++) {
@@ -946,6 +1036,18 @@ function BirthdayConstellationsScene() {
     { name: "Snowy Owgy", date: "August 1", sign: "Leo ♌", trait: "sunlight wrapped in giggles", color: "oklch(0.85 0.16 80)" },
   ];
 
+  const [celebrating, setCelebrating] = useState(false);
+  const shake = useAnimation();
+  const handleComplete = useCallback(() => {
+    if (celebrating) return;
+    setCelebrating(true);
+    shake.start({
+      x: [0, -14, 16, -12, 10, -6, 4, 0],
+      y: [0, 8, -10, 6, -4, 3, -2, 0],
+      transition: { duration: 0.8, ease: "easeInOut" },
+    });
+  }, [celebrating, shake]);
+
   return (
     <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
       <div className="pointer-events-none absolute inset-0"><Starfield density={200} /></div>
@@ -958,7 +1060,8 @@ function BirthdayConstellationsScene() {
             boxShadow: "0 0 20px white",
           }} />
       ))}
-      <div className="relative z-10 mx-auto flex min-h-full max-w-6xl flex-col items-center px-6 py-10 text-center">
+      {celebrating && <Fireworks />}
+      <motion.div animate={shake} className="relative z-10 mx-auto flex min-h-full max-w-6xl flex-col items-center px-6 py-10 text-center">
         <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter VI</div>
         <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">Birthday Constellations</h2>
         <p className="mt-2 text-sm text-white/60">Two stars, written into the sky.</p>
@@ -967,6 +1070,32 @@ function BirthdayConstellationsScene() {
           <Constellation title="Flamobita" date="February 6" points={heart(160, 150, 7)} />
           <Constellation title="Snowy Owgy" date="August 1" points={heart(160, 150, 7)} />
         </div>
+
+        {/* Interactive Heart Builder */}
+        <div className="mt-12 w-full max-w-2xl">
+          <HeartBuilder onComplete={handleComplete} />
+          <AnimatePresence>
+            {celebrating && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="glass-card mt-6 rounded-3xl px-6 py-7 text-center"
+                style={{ boxShadow: "var(--shadow-glow-pink)" }}>
+                <div className="text-3xl">🎉💖🎆</div>
+                <div className="mt-3 text-2xl text-white" style={{ fontFamily: "var(--font-display)" }}>
+                  You drew our heart in the stars.
+                </div>
+                <p className="mt-3 text-base text-white/85" style={{ fontFamily: "var(--font-hand)", fontSize: "1.2rem" }}>
+                  Every star you connected is a day I fall a little more.
+                  Happy Birthday, my Snowy Owgy — the universe lit up because you did.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
 
         {/* Zodiac cards */}
         <div className="mt-12 grid w-full gap-5 sm:grid-cols-2">
@@ -1027,7 +1156,8 @@ function BirthdayConstellationsScene() {
         </motion.div>
 
         <div className="h-10" />
-      </div>
+      </motion.div>
+
       <HiddenItem id="heart" emoji="💖" className="right-8 bottom-8" size="text-xl" />
     </div>
   );
@@ -1114,7 +1244,7 @@ const SCENES: SceneDef[] = [
   { id: "universe",   title: "Our Universe",         render: () => <UniverseScene /> },
   { id: "chat",       title: "Chat Galaxy",          render: () => <ChatGalaxyScene /> },
   { id: "stickers",   title: "Sticker Kingdom",      render: () => <StickerKingdomScene /> },
-  { id: "all-stickers", title: "All Stickers",       render: () => <AllStickersScene /> },
+  
   { id: "memories",   title: "Memory Vault",         render: () => <MemoryVaultScene /> },
   { id: "tour",       title: "World Tour",           render: () => <WorldTourScene /> },
   { id: "stars",      title: "Birthday Constellations", render: () => <BirthdayConstellationsScene /> },
