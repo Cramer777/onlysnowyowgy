@@ -33,6 +33,7 @@ import p5 from "@/assets/photos/1781427501184.jpg.asset.json";
 import p6 from "@/assets/photos/IMG_20260112_065136.jpg.asset.json";
 import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
 import coupleHero from "@/assets/photos/couple-hero.jpg.asset.json";
+import edinburghImg from "@/assets/photos/edinburgh-castle.jpg.asset.json";
 
 const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19];
 const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
@@ -650,7 +651,7 @@ function MemoryVaultScene() {
 
 /* ---------------- Scene 5: World Tour (real photos in 3D) ---------------- */
 const PLACES = [
-  { name: "Edinburgh",   flag: "🏴", landmark: "Edinburgh Castle",      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Edinburgh_Castle_from_the_North.JPG/1280px-Edinburgh_Castle_from_the_North.JPG", color: "oklch(0.70 0.15 160)" },
+  { name: "Edinburgh",   flag: "🏴", landmark: "Edinburgh Castle",      img: edinburghImg.url, color: "oklch(0.70 0.15 160)" },
   { name: "Paris",       flag: "🇫🇷", landmark: "Eiffel Tower",         img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900&q=80", color: "oklch(0.78 0.18 30)" },
   { name: "Switzerland", flag: "🇨🇭", landmark: "The Matterhorn",       img: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900&q=80", color: "oklch(0.85 0.10 220)" },
   { name: "Italy",       flag: "🇮🇹", landmark: "Roman Colosseum",      img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=900&q=80", color: "oklch(0.75 0.18 80)" },
