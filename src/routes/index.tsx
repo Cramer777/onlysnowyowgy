@@ -535,47 +535,8 @@ function StickerKingdomScene() {
   );
 }
 
-/* ---------------- Scene 3b: All Stickers Gallery ---------------- */
-function AllStickersScene() {
-  return (
-    <div className="relative h-full w-full overflow-y-auto overflow-x-hidden">
-      <div className="absolute inset-0"><Starfield density={140} /></div>
-      <NebulaBlobs />
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-10">
-        <div className="text-center">
-          <div className="text-xs uppercase tracking-[0.5em] text-white/60">Chapter III · ½</div>
-          <h2 className="text-gradient-rose mt-1 text-4xl font-light sm:text-5xl">All Stickers</h2>
-          <p className="mt-2 text-sm text-white/60">Every little bear, gathered in one cosmic shelf.</p>
-        </div>
+/* (All Stickers gallery removed — stickers now live solely in Sticker Kingdom) */
 
-        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-5">
-          {BEAR_STICKERS.map((s, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30, rotate: i % 2 ? -6 : 6 }}
-              whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: (i % 5) * 0.08 }}
-              whileHover={{ y: -6, scale: 1.05, rotate: i % 2 ? 3 : -3 }}
-              className="group glass-card relative flex aspect-square items-center justify-center rounded-3xl p-3"
-              style={{ boxShadow: "var(--shadow-glow-pink)" }}
-            >
-              <div className="absolute inset-3 rounded-2xl opacity-40 blur-2xl"
-                style={{ background: "var(--gradient-nebula)" }} />
-              <motion.img
-                src={s.img}
-                alt={s.caption}
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                className="relative h-full w-full object-contain drop-shadow-[0_8px_24px_rgba(255,180,230,0.55)]"
-              />
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 /* ---------------- Scene 4: Memory Vault ---------------- */
