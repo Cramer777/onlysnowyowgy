@@ -872,7 +872,136 @@ function Constellation({ title, date, points }: { title: string; date: string; p
   );
 }
 
+/* ---- Interactive Heart Constellation Builder ---- */
+function HeartBuilder({ onComplete }: { onComplete: () => void }) {
+  // Heart-shaped target stars (parametric heart), in order around the curve
+  const STARS = useMemo(() => {
+    const pts: { x: number; y: number }[] = [];
+    const N = 12;
+    for (let i = 0; i < N; i++) {
+      const t = (i / N) * Math.PI * 2 - Math.PI / 2;
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+      pts.push({ x: 200 + x * 9, y: 170 + y * 9 });
+    }
+    return pts;
+  }, []);
+  const [order, setOrder] = useState<number[]>([]);
+  const done = order.length === STARS.length;
+
+  useEffect(() => { if (done) onComplete(); }, [done, onComplete]);
+
+  const tap = (i: number) => {
+    if (done) return;
+    if (order.includes(i)) return;
+    // Must tap next-nearest unvisited star (helps form the heart cleanly, but allow any-order to be forgiving)
+    setOrder((o) => [...o, i]);
+  };
+
+  const reset = () => setOrder([]);
+
+  const pathD = order.length > 1
+    ? order.map((idx, k) => `${k === 0 ? "M" : "L"} ${STARS[idx].x} ${STARS[idx].y}`).join(" ") + (done ? " Z" : "")
+    : "";
+
+  return (
+    <div className="glass-card relative w-full overflow-hidden rounded-3xl p-4 sm:p-6">
+      <div className="flex items-center justify-between">
+        <div className="text-xs uppercase tracking-[0.4em] text-white/60">Build our heart</div>
+        <button onClick={reset} className="text-[10px] uppercase tracking-[0.3em] text-white/50 hover:text-white">
+          Reset
+        </button>
+      </div>
+      <p className="mt-1 text-sm text-white/70">Tap each star, one by one, to connect our heart.</p>
+      <div className="relative mt-3 aspect-[4/3] w-full">
+        <svg viewBox="0 0 400 340" className="absolute inset-0 h-full w-full">
+          <defs>
+            <filter id="hbglow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            <linearGradient id="hbline" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stopColor="oklch(0.88 0.18 340)" />
+              <stop offset="100%" stopColor="oklch(0.85 0.16 30)" />
+            </linearGradient>
+          </defs>
+          {pathD && (
+            <motion.path
+              d={pathD} fill={done ? "url(#hbline)" : "none"} fillOpacity={done ? 0.18 : 0}
+              stroke="url(#hbline)" strokeWidth={done ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round"
+              filter="url(#hbglow)"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.4 }}
+            />
+          )}
+          {STARS.map((s, i) => {
+            const picked = order.includes(i);
+            const seq = order.indexOf(i) + 1;
+            return (
+              <g key={i} onClick={() => tap(i)} style={{ cursor: done ? "default" : "pointer" }}>
+                <circle cx={s.x} cy={s.y} r={picked ? 7 : 14} fill="transparent" />
+                <circle cx={s.x} cy={s.y} r={picked ? 4.5 : 3} fill="white" filter="url(#hbglow)">
+                  <animate attributeName="opacity" values="0.5;1;0.5" dur={`${2 + (i % 3)}s`} repeatCount="indefinite" />
+                </circle>
+                {picked && (
+                  <text x={s.x + 8} y={s.y - 8} fill="white" fontSize="9" opacity="0.7">{seq}</text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div className="mt-2 text-center text-[11px] uppercase tracking-[0.3em] text-white/50">
+        {done ? "Heart complete ✨" : `${order.length} / ${STARS.length} stars connected`}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Fireworks burst overlay ---- */
+function Fireworks() {
+  const bursts = Array.from({ length: 6 }).map((_, i) => ({
+    x: 10 + (i * 17 + 7) % 80,
+    y: 15 + (i * 23) % 55,
+    delay: i * 0.25,
+    hue: i % 2 ? "oklch(0.85 0.2 340)" : "oklch(0.88 0.18 60)",
+  }));
+  return (
+    <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden">
+      {bursts.map((b, bi) => (
+        <div key={bi} className="absolute" style={{ left: `${b.x}%`, top: `${b.y}%` }}>
+          {Array.from({ length: 18 }).map((_, i) => {
+            const a = (i / 18) * Math.PI * 2;
+            return (
+              <motion.span key={i}
+                className="absolute block h-1.5 w-1.5 rounded-full"
+                style={{ background: b.hue, boxShadow: `0 0 12px ${b.hue}` }}
+                initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                animate={{ x: Math.cos(a) * 120, y: Math.sin(a) * 120, opacity: 0, scale: 0.4 }}
+                transition={{ duration: 1.4, delay: b.delay, ease: "easeOut" }}
+              />
+            );
+          })}
+        </div>
+      ))}
+      {/* falling confetti */}
+      {Array.from({ length: 40 }).map((_, i) => (
+        <motion.span key={`c${i}`}
+          className="absolute block h-2 w-1 rounded-sm"
+          style={{
+            left: `${(i * 53) % 100}%`,
+            background: i % 3 === 0 ? "oklch(0.88 0.18 340)" : i % 3 === 1 ? "oklch(0.9 0.18 60)" : "oklch(0.85 0.16 200)",
+          }}
+          initial={{ y: -20, opacity: 0, rotate: 0 }}
+          animate={{ y: "110vh", opacity: [0, 1, 1, 0], rotate: 360 }}
+          transition={{ duration: 3 + (i % 4), delay: (i % 10) * 0.1, ease: "easeIn" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 function BirthdayConstellationsScene() {
+
   const heart = (cx: number, cy: number, s: number): [number, number][] => {
     const pts: [number, number][] = [];
     for (let i = 0; i < 14; i++) {
