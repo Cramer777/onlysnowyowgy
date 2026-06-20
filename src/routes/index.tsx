@@ -1372,6 +1372,7 @@ function OurUniverse() {
             <QuestHUD />
           </>
         )}
+        <PookieVoice />
       </div>
     </QuestProvider>
   );
