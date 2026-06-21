@@ -1112,16 +1112,6 @@ function BirthdayConstellationsScene() {
     }
     return pts;
   };
-  // Days together since our anniversary (edit date as needed)
-  const ANNIVERSARY = new Date("2024-08-01T00:00:00");
-  const daysTogether = Math.max(1, Math.floor((Date.now() - ANNIVERSARY.getTime()) / 86400000));
-
-  const FACTS = [
-    { label: "Days orbiting together", value: daysTogether.toLocaleString() },
-    { label: "Galaxies we built", value: "∞" },
-    { label: "Stars I'd name after you", value: "every one" },
-    { label: "Universes I'd pick you in", value: "all of them" },
-  ];
 
   const WISHES = [
     "May every sunrise feel like a hug from the sky.",
@@ -1212,18 +1202,6 @@ function BirthdayConstellationsScene() {
           ))}
         </div>
 
-        {/* Cosmic facts */}
-        <div className="mt-10 grid w-full grid-cols-2 gap-4 sm:grid-cols-4">
-          {FACTS.map((f, i) => (
-            <motion.div key={i}
-              initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="glass-card rounded-2xl px-4 py-5 text-center">
-              <div className="text-gradient-rose text-2xl font-light">{f.value}</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.3em] text-white/60">{f.label}</div>
-            </motion.div>
-          ))}
-        </div>
 
         {/* Birthday wishes scroll */}
         <div className="mt-12 w-full max-w-2xl">
