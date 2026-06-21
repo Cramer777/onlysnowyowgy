@@ -184,10 +184,10 @@ export function PookieVoice() {
               <>
                 <div className="text-xs uppercase tracking-[0.3em] text-pink-200">Listening…</div>
                 {heard && <div className="mt-1 text-xs italic text-white/70">"{heard}"</div>}
-                <div className="mt-1 text-[10px] text-white/50">whisper the secret phrase</div>
+                <div className="mt-1 text-[10px] text-white/50">whisper a secret word ✨</div>
               </>
             ) : (
-              <div className="text-pink-100">Access Denied 🚫</div>
+              <div className="text-pink-100">Try one of our secret words ✨</div>
             )}
           </motion.div>
         )}
