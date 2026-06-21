@@ -262,7 +262,7 @@ export function PookieVoice() {
                   className="absolute inset-0 z-10 grid place-items-center px-6 text-center">
                   {revealStep === 0 && (
                     <div className="text-pink-100">
-                      <div className="text-xs uppercase tracking-[0.5em] text-pink-200/80">Secret Phrase Detected 💖</div>
+                      <div className="text-xs uppercase tracking-[0.5em] text-pink-200/80">Secret phrase detected 💖</div>
                     </div>
                   )}
                   {revealStep === 1 && (
