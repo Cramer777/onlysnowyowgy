@@ -2,13 +2,46 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
 
-const PHRASE = "tum pookiee ho";
-
-// Loose match: normalize and accept common transcript variants
+// Approved keywords/phrases (kept private — never shown to the user)
+const KEYWORDS = [
+  "pookie", "pookiee", "pooki",
+  "tum pookiee ho", "tum pookie ho", "pookie ho",
+  "tum meri pookie ho", "meri pookie",
+  "barbie", "barbiee", "tum barbiee ho",
+  "snowy owgy", "owgy",
+  "pagal", "tum pagal ho",
+  "happoo", "hapoo",
+];
+function normalize(s: string) {
+  return s.toLowerCase().replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+function sim(a: string, b: string): number {
+  if (!a.length || !b.length) return 0;
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+  return 1 - dp[m][n] / Math.max(m, n);
+}
 function matchesSecret(raw: string): boolean {
-  const t = raw.toLowerCase().replace(/[^a-z\s]/g, "").replace(/\s+/g, " ").trim();
-  // accept "pookiee", "pookie", "pooki"
-  return /\btum\s+pook(ie+|i)\s+ho\b/.test(t);
+  const t = normalize(raw);
+  if (!t) return false;
+  const words = t.split(" ");
+  for (const kw of KEYWORDS) {
+    if (t.includes(kw)) return true;
+    const k = kw.split(" ");
+    if (k.length === 1) {
+      for (const w of words) if (sim(w, kw) >= 0.7) return true;
+    } else {
+      for (let i = 0; i + k.length <= words.length; i++) {
+        const win = words.slice(i, i + k.length).join(" ");
+        if (sim(win, kw) >= 0.7) return true;
+      }
+    }
+  }
+  return false;
 }
 
 type Phase = "idle" | "listening" | "denied" | "opening" | "open";
@@ -151,10 +184,10 @@ export function PookieVoice() {
               <>
                 <div className="text-xs uppercase tracking-[0.3em] text-pink-200">Listening…</div>
                 {heard && <div className="mt-1 text-xs italic text-white/70">"{heard}"</div>}
-                <div className="mt-1 text-[10px] text-white/50">whisper the secret phrase</div>
+                <div className="mt-1 text-[10px] text-white/50">whisper a secret word ✨</div>
               </>
             ) : (
-              <div className="text-pink-100">Access Denied 🚫</div>
+              <div className="text-pink-100">Try one of our secret words ✨</div>
             )}
           </motion.div>
         )}
@@ -229,7 +262,7 @@ export function PookieVoice() {
                   className="absolute inset-0 z-10 grid place-items-center px-6 text-center">
                   {revealStep === 0 && (
                     <div className="text-pink-100">
-                      <div className="text-xs uppercase tracking-[0.5em] text-pink-200/80">Secret Phrase Detected 💖</div>
+                      <div className="text-xs uppercase tracking-[0.5em] text-pink-200/80">Secret phrase detected 💖</div>
                     </div>
                   )}
                   {revealStep === 1 && (

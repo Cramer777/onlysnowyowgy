@@ -887,15 +887,26 @@ function HeartBuilder({ onComplete }: { onComplete: () => void }) {
     return pts;
   }, []);
   const [order, setOrder] = useState<number[]>([]);
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [flash, setFlash] = useState<null | "tap" | "undo" | "reset" | "complete">(null);
   const done = order.length === STARS.length;
-  useEffect(() => { if (done) onComplete(); }, [done, onComplete]);
+  const buzz = (pattern: number | number[]) => {
+    try { if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(pattern); } catch {}
+  };
+  useEffect(() => { if (done) { onComplete(); buzz([30, 40, 60, 40, 120]); setFlash("complete"); setTimeout(() => setFlash(null), 1200); } }, [done, onComplete]);
 
   const tap = (i: number) => {
     if (done || order.includes(i)) return;
     setOrder((o) => [...o, i]);
+    buzz(18);
+    const s = STARS[i];
+    const id = Date.now() + i;
+    setRipples((r) => [...r, { id, x: s.x, y: s.y }]);
+    setTimeout(() => setRipples((r) => r.filter((p) => p.id !== id)), 700);
+    setFlash("tap"); setTimeout(() => setFlash((f) => f === "tap" ? null : f), 200);
   };
-  const reset = () => setOrder([]);
-  const undo = () => setOrder((o) => o.slice(0, -1));
+  const reset = () => { if (!order.length) return; setOrder([]); buzz([20, 30, 20]); setFlash("reset"); setTimeout(() => setFlash((f) => f === "reset" ? null : f), 250); };
+  const undo = () => { if (!order.length) return; setOrder((o) => o.slice(0, -1)); buzz(12); setFlash("undo"); setTimeout(() => setFlash((f) => f === "undo" ? null : f), 200); };
 
   // Pinch / pan
   const [scale, setScale] = useState(1);
@@ -999,16 +1010,43 @@ function HeartBuilder({ onComplete }: { onComplete: () => void }) {
                 </g>
               );
             })}
+            {ripples.map((r) => (
+              <circle key={r.id} cx={r.x} cy={r.y} r={6} fill="none" stroke="oklch(0.9 0.22 340 / 0.9)" strokeWidth={2}>
+                <animate attributeName="r" from="6" to="34" dur="0.7s" fill="freeze" />
+                <animate attributeName="opacity" from="0.9" to="0" dur="0.7s" fill="freeze" />
+              </circle>
+            ))}
           </svg>
         </div>
 
+        {/* feedback flash */}
+        <AnimatePresence>
+          {flash && (
+            <motion.div
+              key={flash}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: flash === "complete" ? 0.55 : flash === "reset" ? 0.35 : 0.22 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: flash === "complete" ? 0.5 : 0.18 }}
+              className="pointer-events-none absolute inset-0 rounded-2xl"
+              style={{
+                background: flash === "reset"
+                  ? "radial-gradient(circle, oklch(0.78 0.22 25 / 0.6), transparent 70%)"
+                  : flash === "complete"
+                  ? "radial-gradient(circle, oklch(0.92 0.22 340 / 0.9), transparent 75%)"
+                  : "radial-gradient(circle, oklch(0.9 0.2 340 / 0.55), transparent 70%)",
+              }}
+            />
+          )}
+        </AnimatePresence>
+
         {/* zoom controls */}
         <div className="absolute bottom-2 right-2 flex flex-col gap-1.5">
-          <button onClick={() => zoom(0.4)} aria-label="Zoom in"
+          <button onClick={() => { zoom(0.4); buzz(8); }} aria-label="Zoom in"
             className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition active:scale-95">+</button>
-          <button onClick={() => zoom(-0.4)} aria-label="Zoom out"
+          <button onClick={() => { zoom(-0.4); buzz(8); }} aria-label="Zoom out"
             className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition active:scale-95">−</button>
-          <button onClick={recenter} aria-label="Recenter"
+          <button onClick={() => { recenter(); buzz(8); }} aria-label="Recenter"
             className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-[10px] text-white backdrop-blur transition active:scale-95">⤾</button>
         </div>
       </div>
