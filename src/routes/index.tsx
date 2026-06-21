@@ -887,15 +887,26 @@ function HeartBuilder({ onComplete }: { onComplete: () => void }) {
     return pts;
   }, []);
   const [order, setOrder] = useState<number[]>([]);
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [flash, setFlash] = useState<null | "tap" | "undo" | "reset" | "complete">(null);
   const done = order.length === STARS.length;
-  useEffect(() => { if (done) onComplete(); }, [done, onComplete]);
+  const buzz = (pattern: number | number[]) => {
+    try { if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(pattern); } catch {}
+  };
+  useEffect(() => { if (done) { onComplete(); buzz([30, 40, 60, 40, 120]); setFlash("complete"); setTimeout(() => setFlash(null), 1200); } }, [done, onComplete]);
 
   const tap = (i: number) => {
     if (done || order.includes(i)) return;
     setOrder((o) => [...o, i]);
+    buzz(18);
+    const s = STARS[i];
+    const id = Date.now() + i;
+    setRipples((r) => [...r, { id, x: s.x, y: s.y }]);
+    setTimeout(() => setRipples((r) => r.filter((p) => p.id !== id)), 700);
+    setFlash("tap"); setTimeout(() => setFlash((f) => f === "tap" ? null : f), 200);
   };
-  const reset = () => setOrder([]);
-  const undo = () => setOrder((o) => o.slice(0, -1));
+  const reset = () => { if (!order.length) return; setOrder([]); buzz([20, 30, 20]); setFlash("reset"); setTimeout(() => setFlash((f) => f === "reset" ? null : f), 250); };
+  const undo = () => { if (!order.length) return; setOrder((o) => o.slice(0, -1)); buzz(12); setFlash("undo"); setTimeout(() => setFlash((f) => f === "undo" ? null : f), 200); };
 
   // Pinch / pan
   const [scale, setScale] = useState(1);
