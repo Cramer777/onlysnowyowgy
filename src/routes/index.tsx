@@ -1010,16 +1010,43 @@ function HeartBuilder({ onComplete }: { onComplete: () => void }) {
                 </g>
               );
             })}
+            {ripples.map((r) => (
+              <circle key={r.id} cx={r.x} cy={r.y} r={6} fill="none" stroke="oklch(0.9 0.22 340 / 0.9)" strokeWidth={2}>
+                <animate attributeName="r" from="6" to="34" dur="0.7s" fill="freeze" />
+                <animate attributeName="opacity" from="0.9" to="0" dur="0.7s" fill="freeze" />
+              </circle>
+            ))}
           </svg>
         </div>
 
+        {/* feedback flash */}
+        <AnimatePresence>
+          {flash && (
+            <motion.div
+              key={flash}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: flash === "complete" ? 0.55 : flash === "reset" ? 0.35 : 0.22 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: flash === "complete" ? 0.5 : 0.18 }}
+              className="pointer-events-none absolute inset-0 rounded-2xl"
+              style={{
+                background: flash === "reset"
+                  ? "radial-gradient(circle, oklch(0.78 0.22 25 / 0.6), transparent 70%)"
+                  : flash === "complete"
+                  ? "radial-gradient(circle, oklch(0.92 0.22 340 / 0.9), transparent 75%)"
+                  : "radial-gradient(circle, oklch(0.9 0.2 340 / 0.55), transparent 70%)",
+              }}
+            />
+          )}
+        </AnimatePresence>
+
         {/* zoom controls */}
         <div className="absolute bottom-2 right-2 flex flex-col gap-1.5">
-          <button onClick={() => zoom(0.4)} aria-label="Zoom in"
+          <button onClick={() => { zoom(0.4); buzz(8); }} aria-label="Zoom in"
             className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition active:scale-95">+</button>
-          <button onClick={() => zoom(-0.4)} aria-label="Zoom out"
+          <button onClick={() => { zoom(-0.4); buzz(8); }} aria-label="Zoom out"
             className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition active:scale-95">−</button>
-          <button onClick={recenter} aria-label="Recenter"
+          <button onClick={() => { recenter(); buzz(8); }} aria-label="Recenter"
             className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-[10px] text-white backdrop-blur transition active:scale-95">⤾</button>
         </div>
       </div>
