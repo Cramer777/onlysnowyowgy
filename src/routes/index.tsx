@@ -255,28 +255,73 @@ function NebulaBlobs() {
 /* ---------------- Music ---------------- */
 function MusicPlayer() {
   const ref = useRef<HTMLAudioElement>(null);
+  const unlockedRef = useRef(false);
+  const wantPlayRef = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [missing, setMissing] = useState(false);
+
+  const tryPlay = async () => {
+    const a = ref.current; if (!a) return false;
+    try {
+      a.muted = false;
+      a.volume = 0.85;
+      await a.play();
+      unlockedRef.current = true;
+      setPlaying(true);
+      setMissing(false);
+      return true;
+    } catch {
+      // Fallback: start muted (almost always allowed), then unmute on next gesture
+      try {
+        a.muted = true;
+        await a.play();
+        setPlaying(true);
+        return true;
+      } catch {
+        setMissing(true);
+        return false;
+      }
+    }
+  };
+
   const toggle = async () => {
     const a = ref.current; if (!a) return;
-    try {
-      if (a.paused) { a.muted = false; a.volume = 0.85; await a.play(); setPlaying(true); }
-      else { a.pause(); setPlaying(false); }
-    } catch { setMissing(true); }
+    if (!a.paused && !a.muted) { a.pause(); setPlaying(false); return; }
+    await tryPlay();
   };
+
   useEffect(() => {
-    const start = async () => {
-      const a = ref.current; if (!a) return;
-      try { a.muted = false; a.volume = 0.85; await a.play(); setPlaying(true); }
-      catch { setMissing(true); }
-    };
+    const a = ref.current;
+    if (a) { a.setAttribute("playsinline", "true"); (a as any).playsInline = true; }
+
+    const start = () => { wantPlayRef.current = true; tryPlay(); };
     window.addEventListener("play-music", start);
-    const onGesture = () => { start(); window.removeEventListener("pointerdown", onGesture); window.removeEventListener("keydown", onGesture); };
-    window.addEventListener("pointerdown", onGesture);
+
+    const onGesture = async () => {
+      const el = ref.current; if (!el) return;
+      // Unmute if we autoplayed muted
+      if (!el.paused && el.muted) { el.muted = false; el.volume = 0.85; }
+      if (el.paused && (wantPlayRef.current || !unlockedRef.current)) {
+        await tryPlay();
+      }
+      if (!el.paused && !el.muted) {
+        unlockedRef.current = true;
+        window.removeEventListener("pointerdown", onGesture);
+        window.removeEventListener("touchend", onGesture);
+        window.removeEventListener("click", onGesture);
+        window.removeEventListener("keydown", onGesture);
+      }
+    };
+    window.addEventListener("pointerdown", onGesture, { passive: true });
+    window.addEventListener("touchend", onGesture, { passive: true });
+    window.addEventListener("click", onGesture);
     window.addEventListener("keydown", onGesture);
+
     return () => {
       window.removeEventListener("play-music", start);
       window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("touchend", onGesture);
+      window.removeEventListener("click", onGesture);
       window.removeEventListener("keydown", onGesture);
     };
   }, []);
