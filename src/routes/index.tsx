@@ -24,6 +24,17 @@ import s16 from "@/assets/uploads2/IMG_20260616_150711.jpg.asset.json";
 import s17 from "@/assets/uploads2/IMG_20260616_150811.jpg.asset.json";
 import s18 from "@/assets/uploads2/IMG_20260616_150840.jpg.asset.json";
 import s19 from "@/assets/uploads2/IMG_20260616_150907.jpg.asset.json";
+// Stickers (10 more) — newest batch
+import s20 from "@/assets/uploads3/IMG_20260616_145559.jpg.asset.json";
+import s21 from "@/assets/uploads3/IMG_20260616_145635.jpg.asset.json";
+import s22 from "@/assets/uploads3/IMG_20260616_145945.jpg.asset.json";
+import s23 from "@/assets/uploads3/IMG_20260616_150113.jpg.asset.json";
+import s24 from "@/assets/uploads3/IMG_20260616_150217.jpg.asset.json";
+import s25 from "@/assets/uploads3/IMG_20260616_150603.jpg.asset.json";
+import s26 from "@/assets/uploads3/IMG_20260616_150740.jpg.asset.json";
+import s27 from "@/assets/uploads3/IMG_20260616_151141.jpg.asset.json";
+import s28 from "@/assets/uploads3/IMG_20260616_151234.jpg.asset.json";
+import s29 from "@/assets/uploads3/IMG_20260616_151303.jpg.asset.json";
 
 // Photos (7) — real memories
 import p1 from "@/assets/photos/1770644205624.jpg.asset.json";
