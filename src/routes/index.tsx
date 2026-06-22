@@ -47,7 +47,7 @@ import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
 import coupleHero from "@/assets/photos/couple-hero.jpg.asset.json";
 import edinburghImg from "@/assets/photos/edinburgh-castle.jpg.asset.json";
 
-const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19];
+const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29];
 const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
 // Per-photo focal point to keep faces in frame
 const PHOTO_POS = ["center", "center", "center", "center", "center", "center", "center 18%"];
