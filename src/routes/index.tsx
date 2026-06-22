@@ -482,6 +482,16 @@ const STICKER_CAPTIONS = [
   "Tasty thoughts 🤤",
   "Tiny warrior 🪓",
   "Big silly grin 😬",
+  "Flower crown princess 👑🌸",
+  "Hat duck swag 🦆",
+  "Sleepy stroll 🌙",
+  "Snoopy thumbs up 👍",
+  "Cheek squish 🤏",
+  "Polar side-eye 🐻‍❄️",
+  "Tiny penguin 🐧",
+  "Knife chick 🔪🐤",
+  "Dab attack 💃",
+  "Heart hug 🤍",
 ];
 const BEAR_STICKERS = STICKERS.map((s, i) => ({ img: s.url, caption: STICKER_CAPTIONS[i] ?? "", mood: "From Snowy's sticker pack" }));
 
