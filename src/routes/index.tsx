@@ -24,6 +24,17 @@ import s16 from "@/assets/uploads2/IMG_20260616_150711.jpg.asset.json";
 import s17 from "@/assets/uploads2/IMG_20260616_150811.jpg.asset.json";
 import s18 from "@/assets/uploads2/IMG_20260616_150840.jpg.asset.json";
 import s19 from "@/assets/uploads2/IMG_20260616_150907.jpg.asset.json";
+// Stickers (10 more) — newest batch
+import s20 from "@/assets/uploads3/IMG_20260616_145559.jpg.asset.json";
+import s21 from "@/assets/uploads3/IMG_20260616_145635.jpg.asset.json";
+import s22 from "@/assets/uploads3/IMG_20260616_145945.jpg.asset.json";
+import s23 from "@/assets/uploads3/IMG_20260616_150113.jpg.asset.json";
+import s24 from "@/assets/uploads3/IMG_20260616_150217.jpg.asset.json";
+import s25 from "@/assets/uploads3/IMG_20260616_150603.jpg.asset.json";
+import s26 from "@/assets/uploads3/IMG_20260616_150740.jpg.asset.json";
+import s27 from "@/assets/uploads3/IMG_20260616_151141.jpg.asset.json";
+import s28 from "@/assets/uploads3/IMG_20260616_151234.jpg.asset.json";
+import s29 from "@/assets/uploads3/IMG_20260616_151303.jpg.asset.json";
 
 // Photos (7) — real memories
 import p1 from "@/assets/photos/1770644205624.jpg.asset.json";
@@ -36,7 +47,7 @@ import p7 from "@/assets/photos/Snapchat-2044494905.jpg.asset.json";
 import coupleHero from "@/assets/photos/couple-hero.jpg.asset.json";
 import edinburghImg from "@/assets/photos/edinburgh-castle.jpg.asset.json";
 
-const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19];
+const STICKERS = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29];
 const PHOTOS = [p1, p2, p3, p4, p5, p6, p7];
 // Per-photo focal point to keep faces in frame
 const PHOTO_POS = ["center", "center", "center", "center", "center", "center", "center 18%"];
@@ -471,6 +482,16 @@ const STICKER_CAPTIONS = [
   "Tasty thoughts 🤤",
   "Tiny warrior 🪓",
   "Big silly grin 😬",
+  "Flower crown princess 👑🌸",
+  "Hat duck swag 🦆",
+  "Sleepy stroll 🌙",
+  "Snoopy thumbs up 👍",
+  "Cheek squish 🤏",
+  "Polar side-eye 🐻‍❄️",
+  "Tiny penguin 🐧",
+  "Knife chick 🔪🐤",
+  "Dab attack 💃",
+  "Heart hug 🤍",
 ];
 const BEAR_STICKERS = STICKERS.map((s, i) => ({ img: s.url, caption: STICKER_CAPTIONS[i] ?? "", mood: "From Snowy's sticker pack" }));
 
