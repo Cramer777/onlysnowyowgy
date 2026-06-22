@@ -282,15 +282,23 @@ function MusicPlayer() {
   }, []);
   return (
     <div className="fixed bottom-5 right-5 z-50">
-      <audio ref={ref} src="/music/ik-kudi.mp3" loop preload="auto" onError={() => setMissing(true)} />
+      <audio ref={ref} src="/music/voh-dekhnay-mein.mp3" loop preload="auto" onError={() => setMissing(true)} />
       <button onClick={toggle}
         className="glass-card flex items-center gap-3 rounded-full px-4 py-3 text-sm transition hover:scale-105"
         style={{ boxShadow: "var(--shadow-glow-pink)" }}>
-        <span className={`grid h-9 w-9 place-items-center rounded-full ${playing ? "animate-pulse-glow" : ""}`}
-          style={{ background: "var(--gradient-nebula)" }}>{playing ? "❚❚" : "▶"}</span>
+        <span
+          className={`relative grid h-10 w-10 place-items-center rounded-full overflow-hidden ${playing ? "animate-spin-slow" : ""}`}
+          style={{
+            background:
+              "radial-gradient(circle at center, #1a1a1a 0 22%, #e94f9a 22% 26%, #1a1a1a 26% 60%, #2a2a2a 60% 100%)",
+            boxShadow: "inset 0 0 6px rgba(0,0,0,0.6), 0 0 12px rgba(233,79,154,0.5)",
+          }}>
+          <span className="absolute inset-0 rounded-full" style={{ background: "repeating-radial-gradient(circle, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px)" }} />
+          <span className="relative z-10 h-2 w-2 rounded-full bg-white/90" />
+        </span>
         <div className="text-left leading-tight">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Now Playing</div>
-          <div className="font-medium">Ik Kudi · Arpit Bala</div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">{playing ? "Now Spinning 💕" : "Tap to play"}</div>
+          <div className="font-medium">Voh Dekhnay Mein</div>
         </div>
       </button>
       {missing && (
